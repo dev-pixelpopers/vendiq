@@ -63,14 +63,12 @@ function Eyebrow({ children, className = "" }: { children: string; className?: s
  * yPercent of a half's 204px height.
  */
 const HALF = {
-  /** Top half up to the top edge (343 → 12). */
+  /** Top half up to the top edge (343 → 12); also where the bottom half merges under it (547 → 216). */
   topParted: -162.25,
   /** Bottom half down to the bottom edge (547 → 869). */
   bottomParted: 157.8,
-  /** Top half fully off the top of the stage. */
-  topGone: -280,
-  /** Bottom half travels up to sit on the top edge (547 → -26). */
-  bottomOnTop: -280.9,
+  /** Merged wordmark lifts 242px: top half leaves (→ -230), bottom half sits on the top edge (→ -26). */
+  lifted: -280.9,
 };
 
 /**
@@ -79,14 +77,15 @@ const HALF = {
  * stage during the first ~100vh. Keep ARRIVE ≈ 1/8 of the timeline so that
  * slide spans 100vh of the 800vh pinned range.
  */
-const ARRIVE = 1.45;
+const ARRIVE = 1.75;
 
 /**
  * Figma 471:10924 → 479:13722.
  * The section slides in from the top, then the outline wordmark assembles from
  * two halves (top from the left, bottom from the right), parts to frame "Who
- * we are", then the top half leaves and the bottom half rises to the top as
- * the "why choose" diagram assembles around the pantry machine.
+ * we are". On exit the text wipes away, the bottom half rises to re-join the
+ * top half, and the merged wordmark lifts until only its bottom half shows on
+ * the top edge; then the "why choose" diagram assembles around the pantry machine.
  */
 const build: SceneBuilder = (tl, root, { reduced }) => {
   const stage = root.querySelector<HTMLElement>(":scope > .scene-units");
@@ -124,10 +123,20 @@ const build: SceneBuilder = (tl, root, { reduced }) => {
     )
     .to({}, { duration: 0.6 })
     .addLabel("exit")
-    .to("[data-a='who-line']", { yPercent: -110, duration: 0.9, stagger: 0.08, ease: "power2.in" }, "exit")
-    .to("[data-a='wordmark-top']", { yPercent: HALF.topGone, duration: 1.2, ease: "power2.in" }, "exit")
-    .to("[data-a='wordmark-bottom']", { yPercent: HALF.bottomOnTop, duration: 1.6, ease: "power2.inOut" }, "exit")
-    .addLabel("why", "exit+=1")
+    // Content clips away first (bottom edge wipes up to nothing)…
+    .fromTo(
+      "[data-a='who-line']",
+      { clipPath: "inset(0% 0% 0% 0%)" },
+      { clipPath: "inset(0% 0% 100% 0%)", duration: 0.9, stagger: 0.08, ease: "power2.in" },
+      "exit",
+    )
+    // …then the bottom half rises to meet the parked top half, re-forming the wordmark…
+    .addLabel("merge", "exit+=1.2")
+    .to("[data-a='wordmark-bottom']", { yPercent: HALF.topParted, duration: 1.2, ease: "power2.inOut" }, "merge")
+    // …and the merged wordmark lifts together until only the bottom half shows on the top edge.
+    .addLabel("lift", "merge+=1.3")
+    .to(["[data-a='wordmark-top']", "[data-a='wordmark-bottom']"], { yPercent: HALF.lifted, duration: 1, ease: "power2.inOut" }, "lift")
+    .addLabel("why", "lift+=0.6")
     .fromTo("[data-a='why-heading']", { autoAlpha: 0, yPercent: -60 }, { autoAlpha: 1, yPercent: 0, duration: 0.8 }, "why")
     .fromTo("[data-a='pantry']", { autoAlpha: 0, yPercent: 45 }, { autoAlpha: 1, yPercent: 0, duration: 1.4, ease: "power3.out" }, "why")
     // Arcs wipe outward from the machine: left arc right → left, right arc left → right.

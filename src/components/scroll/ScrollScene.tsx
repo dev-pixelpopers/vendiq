@@ -7,6 +7,17 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+/**
+ * `onRefresh` for every scrubbed ScrollTrigger. On reload the browser restores
+ * the scroll position, but a scrubbed animation would sit at its start state
+ * (e.g. a stage parked off screen, so the page looks blank) until the next
+ * scroll. Whenever the trigger is (re)measured, jump its animation straight to
+ * the current scroll position; scrubbing continues smoothly from there.
+ */
+export const jumpToScroll = (self: ScrollTrigger) => {
+  self.animation?.progress(self.progress);
+};
+
 export type SceneBuilder = (tl: gsap.core.Timeline, root: HTMLElement, opts: { reduced: boolean }) => void;
 
 type ScrollSceneProps = {
@@ -52,6 +63,7 @@ export default function ScrollScene({
             start: "top top",
             end: "bottom bottom",
             scrub,
+            onRefresh: jumpToScroll,
           },
         });
         build(tl, el, { reduced: false });

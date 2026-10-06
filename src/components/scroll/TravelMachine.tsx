@@ -5,6 +5,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { jumpToScroll } from "./ScrollScene";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -172,7 +173,7 @@ export default function TravelMachine() {
           v: 1,
           ease: "none",
           onUpdate: () => setTravel({ glide: glide.v }),
-          scrollTrigger: { trigger: story, start: "top bottom", end: "top top", scrub: 0.4 },
+          scrollTrigger: { trigger: story, start: "top bottom", end: "top top", scrub: 0.4, onRefresh: jumpToScroll },
         });
       }
       // Pull-back continues into the industries slot while that stage scrolls in.
@@ -181,7 +182,7 @@ export default function TravelMachine() {
           v: 1,
           ease: "none",
           onUpdate: () => setTravel({ dock: dock.v }),
-          scrollTrigger: { trigger: industries, start: "top bottom", end: "top top", scrub: 0.4 },
+          scrollTrigger: { trigger: industries, start: "top bottom", end: "top top", scrub: 0.4, onRefresh: jumpToScroll },
         });
       }
     });
@@ -204,7 +205,16 @@ export default function TravelMachine() {
     ScrollTrigger.addEventListener("refresh", onRefresh);
     applyTravel();
 
+    // Rendered after every scene, so all triggers exist now. On a reload the
+    // browser has usually restored the scroll position already: re-measure so
+    // each scrubbed scene jumps to it (`jumpToScroll`) instead of showing its
+    // start state until the first scroll.
+    const settle = () => ScrollTrigger.refresh();
+    if (document.readyState === "complete") settle();
+    else window.addEventListener("load", settle, { once: true });
+
     return () => {
+      window.removeEventListener("load", settle);
       ScrollTrigger.removeEventListener("refresh", onRefresh);
       mm.revert();
       if (travel.outer === el) travel.outer = null;

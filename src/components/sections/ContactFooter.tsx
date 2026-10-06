@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import BrandMark from "@/components/brand/BrandMark";
+import { jumpToScroll } from "@/components/scroll/ScrollScene";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -79,6 +80,7 @@ export default function ContactFooter() {
               end: "max",
               scrub: 0.4,
               invalidateOnRefresh: true,
+              onRefresh: jumpToScroll,
             },
           })
           .fromTo("[data-a='footer-bg']", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1 })
