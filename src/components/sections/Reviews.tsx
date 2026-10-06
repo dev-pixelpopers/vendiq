@@ -82,7 +82,7 @@ export default function Reviews() {
         <Image data-a="glow" src={`${A}/glow-orange.svg`} alt="" width={2526} height={2526} className="invisible absolute top-[-112%] left-[-40%] w-[127%] max-w-none opacity-60" />
       </div>
 
-      <div className={`${FRAME} flex flex-col max-lg:[--spacing:calc(100vw/520)] max-lg:[--u:calc(100vw/520)]`}>
+      <div className={`${FRAME} flex flex-col w-full max-lg:[--spacing:calc(100vw/520)] max-lg:[--u:calc(100vw/520)]`}>
         <header className="flex items-end gap-179 pt-205 pl-132 max-lg:flex-col max-lg:items-start max-lg:gap-12 max-lg:px-36 max-lg:pt-120">
           <div className="overflow-hidden">
             <p data-a="reviews-head" className="invisible flex items-center gap-15 pb-12 font-bold text-graphite uppercase fs-40 tracking-[-0.02em]">

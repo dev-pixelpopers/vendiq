@@ -25,7 +25,7 @@ const VENUES = [
 /**
  * Figma 466:593, Variant66 → Variant74 (+ 471:10924).
  * The machine pulls back under the title, then each venue wipes in behind it
- * with its label; an ember sweep hands off to the brand section.
+ * with its label; the About section then slides down over it from the top.
  */
 /** Oversized entry placement (Variant65); percentages of the 414 Figma px machine box. */
 const ENTRY = { xPercent: 42.03, yPercent: -59.76, scale: 1.737 };
@@ -68,12 +68,9 @@ const build: SceneBuilder = (tl) => {
     }
   });
 
-  tl.fromTo(
-    "[data-a='ember-sweep']",
-    { clipPath: "inset(0% 0% 100% 0%)" },
-    { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "power2.inOut" },
-    "+=0.8",
-  );
+  // Last stretch (~100vh): the About section slides down over this stage
+  // (BrandStory overlaps the end of this track), so Industries holds still.
+  tl.to({}, { duration: 1.4 }, "+=0.8");
 };
 
 export default function Industries() {
@@ -152,9 +149,6 @@ export default function Industries() {
           ))}
         </ul>
       </div>
-
-      {/* Hand-off to the ember brand section */}
-      <div data-a="ember-sweep" aria-hidden className={`${LAYER} bg-ember-linear [clip-path:inset(0%_0%_100%_0%)]`} />
     </ScrollScene>
   );
 }
