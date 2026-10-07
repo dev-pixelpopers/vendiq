@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import gsap from "gsap";
 import ScrollScene, { FRAME, type SceneBuilder } from "@/components/scroll/ScrollScene";
 
 const A = "/images/vendiq";
@@ -10,13 +12,24 @@ const A = "/images/vendiq";
  * The micromart trio sinks into the bottom of a rising ember card, then the
  * white pitch panel slides up beside the "Ad space" label.
  */
-const build: SceneBuilder = (tl) => {
+const build: SceneBuilder = (tl, root) => {
+  const card = root.querySelector<HTMLElement>("[data-a='ad-card']");
+  const trio = root.querySelector<HTMLElement>("[data-a='trio']");
+  // Crop the trio exactly at the card's bottom edge on every frame, so it never hangs below the card.
+  const clipToCard = () => {
+    if (!card || !trio) return;
+    const c = card.getBoundingClientRect();
+    const t = trio.getBoundingClientRect();
+    const cut = gsap.utils.clamp(0, 100, ((t.bottom - c.bottom) / t.height) * 100);
+    gsap.set(trio, { clipPath: `inset(0% 0% ${cut}% 0% round 29px 30px 0 0)` });
+  };
+
   tl.fromTo("[data-a='ad-card']", { yPercent: 128 }, { yPercent: 0, duration: 1.6, ease: "power2.inOut" })
     .fromTo(
       "[data-a='trio']",
       // Variant31: 1013 px wide at y=186 → Variant33: 1117 px wide at y=607, cropped at the card edge.
-      { yPercent: -48.1, scale: 0.907, clipPath: "inset(0% 0% 0% 0% round 29px 30px 0 0)" },
-      { yPercent: 0, scale: 1, clipPath: "inset(0% 0% 67.1% 0% round 29px 30px 0 0)", duration: 1.6, ease: "power2.inOut" },
+      { yPercent: -48.1, scale: 0.907 },
+      { yPercent: 0, scale: 1, duration: 1.6, ease: "power2.inOut", onUpdate: clipToCard },
       0,
     )
     .fromTo("[data-a='ad-panel']", { yPercent: 100 }, { yPercent: 0, duration: 1.1, ease: "power3.out" }, 1.2)
@@ -48,13 +61,13 @@ export default function AdSpace() {
                 Frame it as an opportunity. For example, a dealership could use the screen for branding and marketing, enhancing
                 their business.
               </p>
-              <a
-                href="#contact"
+              <Link
+                href="/contact"
                 className="mt-49 flex h-56 items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-[#1a1a1a] pr-24 pl-20 font-medium text-white capitalize fs-17 transition-colors hover:bg-brand max-lg:h-11 max-lg:text-sm"
               >
                 <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-31 w-auto max-lg:h-5" />
                 Get started
-              </a>
+              </Link>
             </div>
           </div>
         </div>

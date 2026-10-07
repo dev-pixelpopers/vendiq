@@ -5,36 +5,43 @@ import Image from "next/image";
 import ScrollScene, { FRAME, type SceneBuilder } from "@/components/scroll/ScrollScene";
 import { poseFromBox, rectInStage, registerPose } from "@/components/scroll/TravelMachine";
 import gsap from "gsap";
+import Preloader from "@/components/intro/Preloader";
+import { whenIntroDone } from "@/components/intro/intro";
 
 const A = "/images/vendiq";
 
 /**
- * Figma 466:593, Default → Variant6.
- * Exploded mark → assembled logo → wordmark wipe → silk backdrop + header →
- * ember panel wipes in with headline + machine → outline wordmarks slide in.
+ * Figma 466:593. The preloader (495:14202) ends on the ember filling the
+ * screen, which stays as this hero's background; then the headline wipes in,
+ * the machine rises and the outline wordmarks slide in.
  */
-const build: SceneBuilder = (tl) => {
-  const tl2 = gsap.timeline();
-  tl2.fromTo("[data-a='silk']", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 }, "hero+=0.4")
-    .fromTo(
-      "[data-a='ember']",
-      { clipPath: "inset(0% 0% 0% 100%)" },
-      { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "power2.inOut" },
-      "hero+=1",
-    )
+const build: SceneBuilder = (_tl, _root, { reduced }) => {
+  const intro = gsap.timeline({ paused: true });
+  intro
     .fromTo(
       "[data-a='headline-line']",
       { autoAlpha: 0, clipPath: "inset(0% 100% 0% 0%)" },
       { autoAlpha: 1, clipPath: "inset(0% 0% 0% 0%)", duration: 1.2, stagger: 0.3, ease: "power2.out" },
-      "hero+=1.6",
+      0.2,
+    )
+    // "Vending" settles to 1 alongside its own clip-path wipe (2nd line: 0.2 + 0.3 stagger).
+    .fromTo(
+      "[data-a-scale='vending']",
+      { scale: 1.4, transformOrigin: "left center" },
+      { scale: 1, duration: 1.2, ease: "power2.out" },
+      0.5,
     )
     .fromTo(
       "[data-a='outline']",
       { autoAlpha: 0, xPercent: 110 },
-      { autoAlpha: 0.33, xPercent: 0, duration: 1.6, stagger: 0.15, ease: "power2.out" },
-      "hero+=2.6",
-    )
-    .to({}, { duration: 1 });
+      { autoAlpha: 0.33, xPercent: 0, duration: 1.6, ease: "power2.out" },
+      1.2,
+    );
+  const off = whenIntroDone(() => (reduced ? intro.progress(1) : intro.play()));
+  return () => {
+    off();
+    intro.kill();
+  };
 };
 
 export default function IntroHero() {
@@ -56,12 +63,9 @@ export default function IntroHero() {
       stageClassName="bg-white"
       build={build}
     >
-      {/* Full-bleed backdrop: orange corner glow + silk, then the ember panel */}
+      {/* Preloader; its ember stays behind as the full-bleed backdrop */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div data-a="silk" className="invisible absolute inset-0 bg-[linear-gradient(46.94deg,#fc5a0a_5.68%,#ffffff_24.66%)]">
-          <Image src={`${A}/hero-silk.webp`} alt="" fill priority sizes="100vw" className="object-cover object-bottom opacity-33" />
-        </div>
-        <div data-a="ember" className="bg-ember-radial absolute inset-0 [clip-path:inset(0%_0%_0%_100%)]" />
+        <Preloader />
       </div>
 
       {/* Outline wordmark fragments (decorative) drifting in from the right */}
@@ -100,7 +104,7 @@ export default function IntroHero() {
           <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
             Smart
           </span>
-          <span data-a="headline-line" className="invisible -mt-24.25 font-condensed font-bold text-sun fs-187.5 leading-[0.964] tracking-[-0.02em]">
+          <span data-a="headline-line" data-a-scale="vending" className="invisible -mt-24.25 font-condensed font-bold text-sun fs-187.5 leading-[0.964] tracking-[-0.02em]">
             Vending
           </span>
           <span data-a="headline-line" className="invisible -mt-42 ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">

@@ -18,7 +18,8 @@ export const jumpToScroll = (self: ScrollTrigger) => {
   self.animation?.progress(self.progress);
 };
 
-export type SceneBuilder = (tl: gsap.core.Timeline, root: HTMLElement, opts: { reduced: boolean }) => void;
+/** May return a cleanup, run when the scene's animations are reverted. */
+export type SceneBuilder = (tl: gsap.core.Timeline, root: HTMLElement, opts: { reduced: boolean }) => void | (() => void);
 
 type ScrollSceneProps = {
   /** Height of the tall scroll track, e.g. `h-[500vh]`. */
@@ -66,14 +67,15 @@ export default function ScrollScene({
             onRefresh: jumpToScroll,
           },
         });
-        build(tl, el, { reduced: false });
+        return build(tl, el, { reduced: false });
       });
 
       // Reduced motion: jump straight to each scene's settled end state.
       mm.add("(prefers-reduced-motion: reduce)", () => {
         const tl = gsap.timeline({ paused: true });
-        build(tl, el, { reduced: true });
+        const cleanup = build(tl, el, { reduced: true });
         tl.progress(1);
+        return cleanup;
       });
     },
     { scope: root },

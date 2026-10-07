@@ -69,6 +69,11 @@ body {
   );
 }
 
+/* The preloader's ember (Figma 495:14336), kept as the hero background. Mirrors EMBER_GRADIENT. */
+@utility bg-ember-preloader {
+  background-image: radial-gradient(ellipse 48.6% 98.1% at 46.9% 49.9%, #cf5826 0%, #762700 100%);
+}
+
 @utility bg-ember-linear {
   background-image: linear-gradient(180deg, #692300 0%, #993a0a 47.6%, #692300 100%);
 }

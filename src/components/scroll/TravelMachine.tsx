@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { jumpToScroll } from "./ScrollScene";
+import { whenIntroDone } from "@/components/intro/intro";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -147,16 +148,20 @@ export function rectInStage(el: HTMLElement) {
 export default function TravelMachine() {
   const outer = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
+  useGSAP((_, contextSafe) => {
     const el = outer.current;
     if (!el) return;
     travel.outer = el;
 
-    // Hero entrance plays once on load, on the inner image only.
-    gsap.fromTo(
-      ".machine-drink",
-      { autoAlpha: 0, yPercent: 72 },
-      { autoAlpha: 1, yPercent: 0, duration: 1.8, ease: "power3.out", delay: 1.4 },
+    // Hero entrance plays once the preloader hands over, on the inner image only.
+    const offIntro = whenIntroDone(
+      contextSafe!((waited: boolean) => {
+        gsap.fromTo(
+          ".machine-drink",
+          { autoAlpha: 0, yPercent: 72, clipPath: "inset(100% 0% 0% 0%)" },
+          { autoAlpha: 1, yPercent: 0, clipPath: "inset(0% 0% 0% 0%)", duration: 1.8, ease: "power3.out", delay: waited ? 0 : 1.4 },
+        );
+      }),
     );
 
     const story = document.querySelector<HTMLElement>("#product-story");
@@ -214,6 +219,7 @@ export default function TravelMachine() {
     else window.addEventListener("load", settle, { once: true });
 
     return () => {
+      offIntro();
       window.removeEventListener("load", settle);
       ScrollTrigger.removeEventListener("refresh", onRefresh);
       mm.revert();
