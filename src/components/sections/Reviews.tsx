@@ -15,8 +15,8 @@ type Review = {
 };
 
 const FITNESS: Review = {
-  title: "Simple for our members. Smart for our space",
-  quote: "The technology is what really stood out to us. Customers can simply tap, take what they need, and go. It’s a much more modern vending experience.",
+  title: "Fully Managed",
+  quote: "We handle installation, stocking, inventory monitoring, maintenance and ongoing service.",
   name: "Fitness Facility Manager",
   org: "24/7 Fitness Arizona",
   avatar: "avatar-fitness.webp",
@@ -24,8 +24,8 @@ const FITNESS: Review = {
 };
 
 const PROPERTY: Review = {
-  title: "A seamless experience from day one",
-  quote: "Vend IQ made the entire process incredibly straightforward. The machine looks great in our space, and the tap-to-pay experience has been a real upgrade for our residents.",
+  title: "Modern Technology",
+  quote: "Cashless payments, real-time inventory monitoring and a premium self-service experience.",
   name: "Property Manager",
   org: "Multi-Family Community, Arizona",
   avatar: "avatar-property.webp",
@@ -33,33 +33,42 @@ const PROPERTY: Review = {
 };
 
 const COMMUNITY: Review = {
-  title: "It feels like a premium amenity",
-  quote: "Our residents wanted convenient access to snacks and drinks, but we didn’t want something that looked like a traditional vending machine. Vend IQ fits the space perfectly and is incredibly easy to use.",
+  title: "Customized to Your Location",
+  quote: "Product selections can be tailored around the people who actually use your location.",
   name: "Community Manager",
   org: "Residential Community, Arizona",
   avatar: "avatar-community.webp",
   logo: { src: "client-logo-a.png", width: 250, height: 70, className: "h-35" },
 };
 
-const TRACK: Review[] = [FITNESS, PROPERTY, COMMUNITY, FITNESS, PROPERTY, COMMUNITY, FITNESS];
+const COMMUNITY_2: Review = {
+  title: "Local Service",
+  quote: "Locally operated in the Phoenix area, giving our partners responsive, hands-on support.",
+  name: "Community Manager",
+  org: "Residential Community, Arizona",
+  avatar: "avatar-community.webp",
+  logo: { src: "client-logo-a.png", width: 250, height: 70, className: "h-35" },
+};
+
+const TRACK: Review[] = [FITNESS, PROPERTY, COMMUNITY, COMMUNITY_2, FITNESS, PROPERTY, COMMUNITY, FITNESS];
 
 function ReviewCard({ r }: { r: Review }) {
   return (
     <article
       data-a="review"
-      className="invisible flex h-541 w-448 shrink-0 flex-col rounded-[10px] border border-[#eaeaea] bg-white px-28 pt-21 pb-32 text-black capitalize"
+      className="invisible flex h-400 w-448 shrink-0 flex-col rounded-[10px] border border-[#eaeaea] bg-white px-28 pt-21 pb-32 text-black capitalize"
     >
-      <div className="flex items-start justify-between">
+      {/* <div className="flex items-start justify-between">
         <Image src={`${A}/${r.avatar}`} alt="" width={184} height={184} className="size-92 rounded-full object-cover" />
         <div className="mt-16 flex h-57 w-178 items-center justify-center rounded-full border border-[#dadada] bg-white">
           <Image src={`${A}/${r.logo.src}`} alt="" width={r.logo.width} height={r.logo.height} className={`w-auto ${r.logo.className}`} />
         </div>
-      </div>
+      </div> */}
       <Image src={`${A}/quote-mark.png`} alt="" width={96} height={80} className="mt-63 h-40 w-48" />
       <h3 className="mt-37 w-301 font-bold fs-24 leading-none tracking-[-0.02em]">{r.title}</h3>
       <p className="mt-42 w-389 font-normal fs-18 leading-[1.333] tracking-[-0.02em]">{r.quote}</p>
-      <p className="mt-auto font-medium fs-18 leading-[1.333] tracking-[-0.02em]">{r.name}</p>
-      <p className="font-light italic fs-16 leading-[1.5] tracking-[-0.02em]">{r.org}</p>
+      {/* <p className="mt-auto font-medium fs-18 leading-[1.333] tracking-[-0.02em]">{r.name}</p> */}
+      {/* <p className="font-light italic fs-16 leading-[1.5] tracking-[-0.02em]">{r.org}</p> */}
     </article>
   );
 }
@@ -87,12 +96,12 @@ export default function Reviews() {
           <div className="overflow-hidden">
             <p data-a="reviews-head" className="invisible flex items-center gap-15 pb-12 font-bold text-graphite uppercase fs-40 tracking-[-0.02em]">
               <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-33 w-auto" />
-              Client reviews
+              Why Us
             </p>
           </div>
           <div className="overflow-hidden">
             <h2 data-a="reviews-head" className="invisible pt-8 font-condensed font-bold text-black capitalize fs-93.25 leading-[0.825] tracking-[-0.04em]">
-              Real stories, real results
+              Why Businesses Choose VendIQ
             </h2>
           </div>
         </header>

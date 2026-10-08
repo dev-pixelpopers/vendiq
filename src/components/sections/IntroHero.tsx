@@ -99,16 +99,16 @@ export default function IntroHero() {
       </div> */}
 
       {/* Headline + machine */}
-      <div className={`${FRAME} flex items-start pl-175 max-lg:flex-col max-lg:px-60`}>
-        <h1 className="flex w-769 shrink-0 flex-col pt-307 uppercase max-lg:w-full max-lg:pt-220">
-          <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
+      <div className={`${FRAME} flex items-center pl-175 max-lg:flex-col max-lg:px-60`}>
+        <h1 className="flex w-769 shrink-0 flex-col uppercase max-lg:w-full max-lg:pt-220">
+          {/* <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
             Smart
-          </span>
+          </span> */}
           <span data-a="headline-line" data-a-scale="vending" className="invisible -mt-24.25 font-condensed font-bold text-sun fs-187.5 leading-[0.964] tracking-[-0.02em]">
             Vending
           </span>
           <span data-a="headline-line" className="invisible -mt-42 ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
-            Reimagined
+            Done Smart
           </span>
         </h1>
       </div>

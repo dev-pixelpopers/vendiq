@@ -19,7 +19,7 @@ type Callout = {
 const LEFT: Callout[] = [
   { text: "Smarter Vending. Better Experience", indent: "ml-99", gap: "", textWidth: "w-311", connector: { src: "connector-left-1.svg", width: 391, className: "left-15 -top-19 w-391" } },
   { text: "Built for Modern Workplaces", indent: "ml-0", gap: "mt-110", textWidth: "w-352", connector: { src: "connector-left-2.svg", width: 340, className: "left-86 -top-23 w-340" } },
-  { text: "The Vend IQ Difference", indent: "ml-93", gap: "mt-93", textWidth: "w-308", connector: { src: "connector-left-3.svg", width: 296, className: "left-98 -top-18 w-296" } },
+  { text: "Smart Inventory Tracking", indent: "ml-93", gap: "mt-93", textWidth: "w-308", connector: { src: "connector-left-3.svg", width: 296, className: "left-98 -top-18 w-296" } },
 ];
 
 const RIGHT: Callout[] = [
@@ -200,7 +200,7 @@ export default function BrandStory() {
           </h2>
           <div className="mt-28 overflow-hidden">
             <p data-a="who-line" className="invisible font-medium text-white capitalize fs-34 leading-[1.47] tracking-[-0.02em] max-lg:text-base">
-              Vend IQ delivers intelligent vending and micro-market solutions designed for modern workplaces. We combine real-time
+              Vend IQ delivers intelligent vending and micro-market solutions for modern residential, commercial and high-traffic spaces. We combine real-time
               data, smart technology, and hands-on service to create fully managed breakroom experiences that employees and
               customers actually use
             </p>

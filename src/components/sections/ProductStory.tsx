@@ -36,7 +36,7 @@ type Caption = { lead: string; sub: string; subFirst: boolean; subClassName?: st
 const CAPTIONS: Caption[] = [
   { lead: "Pay", sub: "Tap to", subFirst: true },
   { lead: "Grab", sub: "and go", subFirst: false },
-  { lead: "Done", sub: "to the payment", subFirst: false, subClassName: "w-460" },
+  { lead: "Done", sub: "Automatic Checkout", subFirst: false, subClassName: "w-460" },
 ];
 
 function StoryCaption({ lead, sub, subFirst, subClassName = "" }: Caption) {

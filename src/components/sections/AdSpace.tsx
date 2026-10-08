@@ -40,16 +40,16 @@ const build: SceneBuilder = (tl, root) => {
 export default function AdSpace() {
   return (
     <ScrollScene id="ad-space" label="Ad space on LCD screen" trackClassName="h-[350vh]" stageClassName="bg-white" build={build}>
-      <div className={`${FRAME} flex justify-center pt-214 max-lg:px-24 max-lg:pt-120`}>
+      <div className={`${FRAME} flex justify-center pt-50 max-lg:px-24 max-lg:pt-120`}>
         <div
           data-a="ad-card"
-          className="bg-ember-linear flex h-681 w-1572 items-start gap-101 rounded-[20px] pt-8 pl-85 max-lg:h-auto max-lg:w-full max-lg:flex-col max-lg:gap-24 max-lg:p-40 max-lg:pb-[45vw]"
+          className="bg-ember-linear flex h-900 w-1572 items-start gap-101 rounded-[20px] pt-8 pl-85 max-lg:h-auto max-lg:w-full max-lg:flex-col max-lg:gap-24 max-lg:p-40 max-lg:pb-[45vw]"
         >
           <div className="mt-140 w-379 shrink-0 overflow-hidden max-lg:mt-0">
             <h2 data-a="ad-label" className="invisible flex items-start gap-14 font-bold text-[#fffcf6] uppercase fs-40 tracking-[-0.02em] max-lg:text-lg">
               <Image src="/images/vendiq/logo-mark.png" alt="" width={112} height={85} className="mt-35 h-33 w-auto max-lg:mt-1" />
               <span>
-                Ad space on
+                Your Logo on the
                 <br />
                 LCD screen
               </span>
@@ -57,13 +57,15 @@ export default function AdSpace() {
           </div>
           <div className="h-666 w-979 overflow-hidden pt-22 max-lg:h-auto max-lg:w-full">
             <div data-a="ad-panel" className="flex h-620 flex-col items-start rounded-[20px] bg-white pt-73 pl-98 max-lg:h-auto max-lg:p-24">
-              <p className="w-784 font-medium text-[#242121] capitalize fs-34 leading-[1.294] tracking-[-0.02em] max-lg:w-full max-lg:text-base">
-                Frame it as an opportunity. For example, a dealership could use the screen for branding and marketing, enhancing
-                their business.
+              <p className="w-784 font-medium text-[#242121] capitalize fs-30 leading-[1.294] tracking-[-0.02em] max-lg:w-full max-lg:text-base">
+                Make the VendIQ experience feel like part of your space. We can feature your company or property logo directly on the machine’s LCD screen, along with your own marketing materials, announcements, promotions, events, and other important messaging.
+              </p>
+              <p className="w-784 font-medium text-[#242121] capitalize fs-30 leading-[1.294] tracking-[-0.02em] max-lg:w-full max-lg:text-base">
+                It’s more than smart vending—it’s a digital communication space customized for your location.
               </p>
               <Link
                 href="/contact"
-                className="mt-49 flex h-56 items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-[#1a1a1a] pr-24 pl-20 font-medium text-white capitalize fs-17 transition-colors hover:bg-brand max-lg:h-11 max-lg:text-sm"
+                className="mt-10 flex h-56 items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-[#1a1a1a] pr-24 pl-20 font-medium text-white capitalize fs-17 transition-colors hover:bg-brand max-lg:h-11 max-lg:text-sm"
               >
                 <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-31 w-auto max-lg:h-5" />
                 Get started
