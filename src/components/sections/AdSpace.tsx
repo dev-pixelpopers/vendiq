@@ -79,11 +79,11 @@ export default function AdSpace() {
       <div className={`${FRAME} pointer-events-none flex justify-center pt-607 max-lg:items-end max-lg:pb-40`}>
         <Image
           data-a="trio"
-          src={`${A}/micromart-trio.webp`}
+          src="/videos/VendIQ-VIDEO.gif"
           alt="Three VendIQ micromart fridges with LCD ad screens"
-          width={1013}
-          height={794}
-          sizes="(min-width: 1024px) 60vw, 90vw"
+          width={1006}
+          height={805}
+          unoptimized
           className="h-auto w-1117 max-w-none origin-top self-start max-lg:self-end"
         />
       </div>
