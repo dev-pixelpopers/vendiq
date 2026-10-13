@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import ScrollScene, { FRAME, LAYER, type SceneBuilder } from "@/components/scroll/ScrollScene";
 import {
+  FoodMachine,
   MACHINE_H,
-  MACHINE_SRC,
   MACHINE_W,
   poseFromBox,
   rectInStage,
@@ -75,7 +75,7 @@ const build: SceneBuilder = (tl) => {
 
 export default function Industries() {
   const slot = useRef<HTMLDivElement>(null);
-  const machine = useRef<HTMLImageElement>(null);
+  const machine = useRef<HTMLDivElement>(null);
 
   // Where the travelling machine lands: the slot's layout box with ENTRY applied.
   useEffect(() => {
@@ -123,16 +123,14 @@ export default function Industries() {
           </div>
         </div>
         <div ref={slot} className="-mt-50 w-414 shrink-0">
-          <Image
+          <div
             ref={machine}
             data-a="machine"
-            src={MACHINE_SRC}
-            alt="VendIQ smart vending machine stocked with drinks"
-            width={MACHINE_W}
-            height={MACHINE_H}
-            sizes="(min-width: 1024px) 50vw, 90vw"
-            className="invisible block h-auto w-full max-w-none origin-top-left"
-          />
+            className="invisible relative w-full origin-top-left"
+            style={{ aspectRatio: `${MACHINE_W} / ${MACHINE_H}` }}
+          >
+            <FoodMachine alt="VendIQ smart vending machine stocked with fresh food and drinks" eager />
+          </div>
         </div>
       </div>
 

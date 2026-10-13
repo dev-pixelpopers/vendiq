@@ -17,12 +17,43 @@ export const MACHINE_SRC = "/images/vendiq/machine.png";
 
 /** Bounding boxes in `machine.png` pixels (measured once from the asset). */
 export const MACHINE_BODY_PNG = { x: 71, y: 79, w: 482, h: 1248 };
-export const TERMINAL_PNG = { x: 138, y: 572, w: 43, h: 66 };
+
+/**
+ * The food machine the story ends on (a tight cutout of its last frame). It
+ * shares the drinks machine's box: same body width, standing on the same floor.
+ */
+export const FOOD_SRC = "/images/vendiq/sequence-high-quality/last%20one.png";
+export const FOOD_W = 468;
+export const FOOD_H = 1180;
+const FOOD_BOX_W = 482;
+const FOOD_BOX_H = (FOOD_BOX_W * FOOD_H) / FOOD_W;
+/** Food machine placement in box px. */
+export const FOOD_BOX = { x: 71, y: 1328 - FOOD_BOX_H, w: FOOD_BOX_W, h: FOOD_BOX_H };
 
 /** Top-left in viewport px + uniform scale of the 624px-wide overlay box. */
 export type Pose = { x: number; y: number; s: number };
 
-type PoseName = "hero" | "f01" | "terminal" | "industries";
+type PoseName = "hero" | "f01" | "last" | "industries";
+
+/** Food machine image positioned inside a box laid out at MACHINE_W × MACHINE_H. */
+export function FoodMachine({ alt = "", eager = false }: { alt?: string; eager?: boolean }) {
+  return (
+    <Image
+      src={FOOD_SRC}
+      alt={alt}
+      width={FOOD_W}
+      height={FOOD_H}
+      unoptimized
+      loading={eager ? "eager" : undefined}
+      className="absolute h-auto max-w-none"
+      style={{
+        left: `${(FOOD_BOX.x / MACHINE_W) * 100}%`,
+        top: `${(FOOD_BOX.y / MACHINE_H) * 100}%`,
+        width: `${(FOOD_BOX.w / MACHINE_W) * 100}%`,
+      }}
+    />
+  );
+}
 
 /**
  * One machine travels the whole page: hero → product sequence → industries.
@@ -31,6 +62,8 @@ type PoseName = "hero" | "f01" | "terminal" | "industries";
  */
 const travel = {
   outer: null as HTMLElement | null,
+  drinkEl: null as HTMLElement | null,
+  foodEl: null as HTMLElement | null,
   dockEl: null as HTMLElement | null,
   poses: {} as Partial<Record<PoseName, () => Pose>>,
   reduced: false,
@@ -59,12 +92,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const mixPose = (a: Pose, b: Pose, t: number): Pose => ({ x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), s: lerp(a.s, b.s, t) });
 
 /**
- * Camera-style move: scale changes geometrically while the terminal (the
- * point we zoomed into) glides linearly on screen.
+ * Camera-style move: scale changes geometrically while the food machine's
+ * centre glides linearly on screen.
  */
 const cameraPose = (a: Pose, b: Pose, t: number): Pose => {
-  const px = TERMINAL_PNG.x + TERMINAL_PNG.w / 2;
-  const py = TERMINAL_PNG.y + TERMINAL_PNG.h / 2;
+  const px = FOOD_BOX.x + FOOD_BOX.w / 2;
+  const py = FOOD_BOX.y + FOOD_BOX.h / 2;
   const s = a.s * Math.pow(b.s / a.s, t);
   const sx = lerp(a.x + px * a.s, b.x + px * b.s, t);
   const sy = lerp(a.y + py * a.s, b.y + py * b.s, t);
@@ -73,9 +106,9 @@ const cameraPose = (a: Pose, b: Pose, t: number): Pose => {
 
 /** Pose along the pull-back (t: 0 = matched to the last frame, 1 = industries slot). */
 export function pullPose(t: number): Pose | null {
-  const { terminal, industries } = travel.poses;
-  if (!terminal || !industries) return null;
-  return cameraPose(terminal(), industries(), t);
+  const { last, industries } = travel.poses;
+  if (!last || !industries) return null;
+  return cameraPose(last(), industries(), t);
 }
 
 function currentPose(): Pose | null {
@@ -97,9 +130,13 @@ export function storyPullPose(zoom: number) {
 }
 
 export function applyTravel() {
-  const { outer, dockEl } = travel;
+  const { outer, dockEl, drinkEl, foodEl } = travel;
   if (dockEl) gsap.set(dockEl, { autoAlpha: travel.reduced || travel.docked ? 1 : 0 });
   if (!outer) return;
+  // Drinks machine up to the story, food machine from its last frame onwards.
+  const food = !travel.reduced && (travel.zoom > 0 || travel.dock > 0);
+  if (drinkEl) gsap.set(drinkEl, { autoAlpha: food ? 0 : 1 });
+  if (foodEl) gsap.set(foodEl, { autoAlpha: food ? 1 : 0 });
   const pose = currentPose();
   if (!pose) return;
   // The story canvas owns the machine from reveal until its pull-back crossfade completes.
@@ -147,11 +184,15 @@ export function rectInStage(el: HTMLElement) {
 
 export default function TravelMachine() {
   const outer = useRef<HTMLDivElement>(null);
+  const drink = useRef<HTMLDivElement>(null);
+  const food = useRef<HTMLDivElement>(null);
 
   useGSAP((_, contextSafe) => {
     const el = outer.current;
     if (!el) return;
     travel.outer = el;
+    travel.drinkEl = drink.current;
+    travel.foodEl = food.current;
 
     // Hero entrance plays once the preloader hands over, on the inner image only.
     const offIntro = whenIntroDone(
@@ -223,7 +264,11 @@ export default function TravelMachine() {
       window.removeEventListener("load", settle);
       ScrollTrigger.removeEventListener("refresh", onRefresh);
       mm.revert();
-      if (travel.outer === el) travel.outer = null;
+      if (travel.outer === el) {
+        travel.outer = null;
+        travel.drinkEl = null;
+        travel.foodEl = null;
+      }
     };
   });
 
@@ -235,15 +280,20 @@ export default function TravelMachine() {
       className="pointer-events-none invisible fixed top-0 left-0 z-[5] origin-top-left"
       style={{ width: MACHINE_W, height: MACHINE_H }}
     >
-      <Image
-        src={MACHINE_SRC}
-        alt=""
-        width={MACHINE_W}
-        height={MACHINE_H}
-        priority
-        sizes="(min-width: 1024px) 100vw, 200vw"
-        className="machine-drink invisible h-full w-full"
-      />
+      <div ref={drink} className="absolute inset-0">
+        <Image
+          src={MACHINE_SRC}
+          alt=""
+          width={MACHINE_W}
+          height={MACHINE_H}
+          priority
+          sizes="(min-width: 1024px) 100vw, 200vw"
+          className="machine-drink invisible h-full w-full"
+        />
+      </div>
+      <div ref={food} className="invisible absolute inset-0">
+        <FoodMachine eager />
+      </div>
     </div>
   );
 }

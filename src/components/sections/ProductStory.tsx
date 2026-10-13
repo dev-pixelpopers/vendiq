@@ -4,32 +4,27 @@ import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import ScrollScene, { FRAME, LAYER, type SceneBuilder } from "@/components/scroll/ScrollScene";
 import {
+  FOOD_BOX,
+  FOOD_SRC,
   MACHINE_BODY_PNG,
-  MACHINE_H,
-  MACHINE_SRC,
-  MACHINE_W,
-  TERMINAL_PNG,
   registerPose,
   setTravel,
   storyPullPose,
   type Pose,
 } from "@/components/scroll/TravelMachine";
 import {
-  FRAME_H,
+  FOOD_IN_LAST,
   MACHINE_BODY_F01,
-  SRC_H,
-  SRC_W,
   STORY_FRAMES,
   STORY_MARKS,
-  TERMINAL_D12,
   fitStage,
   frameScale,
   frameToStage,
 } from "./story-frames";
 
 const LAST = STORY_FRAMES.length - 1;
-/** d12 source px per machine.png px, averaged over both axes of the card reader. */
-const D12_PER_PNG = (TERMINAL_D12.w / TERMINAL_PNG.w + TERMINAL_D12.h / TERMINAL_PNG.h) / 2;
+/** Last-frame source px per overlay box px (the food machine is the same image in both). */
+const LAST_PER_BOX = FOOD_IN_LAST.w / FOOD_BOX.w;
 
 type Caption = { lead: string; sub: string; subFirst: boolean; subClassName?: string };
 
@@ -59,9 +54,9 @@ function StoryCaption({ lead, sub, subFirst, subClassName = "" }: Caption) {
 
 /**
  * Tap → Grab → Done. The hero machine glides onto the first frame, the canvas
- * takes over and the 34-frame sequence plays straight through, then the camera
- * pulls back out of the last frame onto the same machine image, which carries
- * on into Industries.
+ * takes over and the 36-frame sequence plays straight through, ending zoomed
+ * out on the food machine; the camera pulls back out of that frame onto the
+ * same machine image, which carries on into Industries.
  */
 export default function ProductStory() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -96,21 +91,16 @@ export default function ProductStory() {
       const img = images.current[LAST];
       const pose = storyPullPose(st.zoom);
       if (!pose || !img?.complete || !img.naturalWidth) return;
+      const qx = pose.x + FOOD_BOX.x * pose.s;
+      const qy = pose.y + FOOD_BOX.y * pose.s;
       const png = machineImg.current;
       if (png?.complete && png.naturalWidth) {
-        ctx.drawImage(png, pose.x, pose.y, MACHINE_W * pose.s, MACHINE_H * pose.s);
+        ctx.drawImage(png, qx, qy, FOOD_BOX.w * pose.s, FOOD_BOX.h * pose.s);
       }
-      const k = pose.s / D12_PER_PNG;
-      const qx = pose.x + (TERMINAL_PNG.x + TERMINAL_PNG.w / 2) * pose.s;
-      const qy = pose.y + (TERMINAL_PNG.y + TERMINAL_PNG.h / 2) * pose.s;
+      const k = pose.s / LAST_PER_BOX;
+      const frame = STORY_FRAMES[LAST];
       ctx.globalAlpha = 1 - st.mix;
-      ctx.drawImage(
-        img,
-        qx - (TERMINAL_D12.x + TERMINAL_D12.w / 2) * k,
-        qy - (TERMINAL_D12.y + TERMINAL_D12.h / 2) * k,
-        SRC_W * k,
-        SRC_H * k,
-      );
+      ctx.drawImage(img, qx - FOOD_IN_LAST.x * k, qy - FOOD_IN_LAST.y * k, frame.srcW * k, frame.srcH * k);
       ctx.globalAlpha = 1;
       return;
     }
@@ -126,7 +116,9 @@ export default function ProductStory() {
 
     const { desktop, s, ox, oy } = fitStage(W, H);
     const x = a.x + (b.x - a.x) * t;
+    const y = a.y + (b.y - a.y) * t;
     const w = a.w + (b.w - a.w) * t;
+    const h = a.h + (b.h - a.h) * t;
     const clip = desktop ? a.clip + (b.clip - a.clip) * t : 0;
 
     ctx.save();
@@ -135,7 +127,7 @@ export default function ProductStory() {
     ctx.beginPath();
     ctx.rect(clipX, 0, W - clipX, H);
     ctx.clip();
-    ctx.drawImage(img, ox + x * s, oy + a.y * s, w * s, FRAME_H * s);
+    ctx.drawImage(img, ox + x * s, oy + y * s, w * s, h * s);
     ctx.restore();
   }, [stageSize]);
 
@@ -155,22 +147,18 @@ export default function ProductStory() {
       const s = (MACHINE_BODY_F01.w * frameScale(frame, W, H)) / MACHINE_BODY_PNG.w;
       return { x: body.x - MACHINE_BODY_PNG.x * s, y: body.y - MACHINE_BODY_PNG.y * s, s };
     };
-    const terminal = (): Pose => {
+    const last = (): Pose => {
       const { W, H } = stageSize();
       const frame = STORY_FRAMES[LAST];
-      const c = frameToStage(frame, TERMINAL_D12.x + TERMINAL_D12.w / 2, TERMINAL_D12.y + TERMINAL_D12.h / 2, W, H);
-      const s = frameScale(frame, W, H) * D12_PER_PNG;
-      return {
-        x: c.x - (TERMINAL_PNG.x + TERMINAL_PNG.w / 2) * s,
-        y: c.y - (TERMINAL_PNG.y + TERMINAL_PNG.h / 2) * s,
-        s,
-      };
+      const c = frameToStage(frame, FOOD_IN_LAST.x, FOOD_IN_LAST.y, W, H);
+      const s = frameScale(frame, W, H) * LAST_PER_BOX;
+      return { x: c.x - FOOD_BOX.x * s, y: c.y - FOOD_BOX.y * s, s };
     };
     const offF01 = registerPose("f01", f01);
-    const offTerminal = registerPose("terminal", terminal);
+    const offLast = registerPose("last", last);
     return () => {
       offF01();
-      offTerminal();
+      offLast();
     };
   }, [stageSize]);
 
@@ -189,7 +177,7 @@ export default function ProductStory() {
       return img;
     });
     machineImg.current = new window.Image();
-    machineImg.current.src = MACHINE_SRC;
+    machineImg.current.src = FOOD_SRC;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -205,7 +193,7 @@ export default function ProductStory() {
 
   const build: SceneBuilder = (tl, _root, { reduced }) => {
     const st = state.current;
-    const { tapped, grabbed } = STORY_MARKS;
+    const { tapped, grabbed, done } = STORY_MARKS;
     const capIn = { autoAlpha: 1, yPercent: 0, duration: 1.2, ease: "power2.out" };
     const capOut = { autoAlpha: 0, yPercent: -110, duration: 1, ease: "power2.in" };
     const cap = (n: number) => `[data-a='caption']:nth-child(${n})`;
@@ -217,7 +205,7 @@ export default function ProductStory() {
       .to(cap(1), capOut, tapped + 3)
       .fromTo(cap(2), { autoAlpha: 0, yPercent: 110 }, capIn, grabbed - 1.5)
       .to(cap(2), capOut, grabbed + 4)
-      .fromTo(cap(3), { autoAlpha: 0, yPercent: 110 }, capIn, LAST - 3);
+      .fromTo(cap(3), { autoAlpha: 0, yPercent: 110 }, capIn, done - 1);
 
     if (reduced) return;
 
