@@ -132,7 +132,7 @@ export default function ContactHero() {
 
       {/* Machine */}
       <div aria-hidden className={`${FRAME} pointer-events-none`}>
-        <div data-a="hero-machine" className="absolute top-130 right-260 w-540 max-lg:top-auto max-lg:right-[6%] max-lg:bottom-[-24%] max-lg:w-[50%]">
+        <div data-a="hero-machine" className="absolute top-130 right-260 w-540 max-lg:top-auto max-lg:right-[6%] max-lg:bottom-[-12svh] max-lg:w-[min(50%,calc(40svh*624/1392))]">
           <div data-depth="28">
             <Image
               data-a="machine"
@@ -150,7 +150,7 @@ export default function ContactHero() {
 
       {/* Headline, intro + quick actions */}
       <div className={`${FRAME} flex items-start pl-175 max-lg:px-60`}>
-        <div data-a="hero-copy" className="flex flex-col pt-250 max-lg:pt-440">
+        <div data-a="hero-copy" className="flex flex-col pt-250 max-lg:pt-[max(110px,18svh)]">
           <h1 id="contact-hero-heading" className="flex w-769 flex-col uppercase max-lg:w-full">
             <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
               Get in
@@ -167,7 +167,7 @@ export default function ContactHero() {
             </span>
           </h1>
 
-          <p data-a="hero-sub" className="invisible mt-40 ml-12 w-640 font-medium text-white/85 fs-24 leading-[1.45] tracking-[-0.02em] max-lg:w-[78%] max-lg:fs-32">
+          <p data-a="hero-sub" className="invisible mt-40 ml-12 w-640 font-medium text-white/85 fs-24 leading-[1.45] tracking-[-0.02em] max-lg:w-[86%] max-lg:fs-40">
             Tell us about your space and we’ll help you find the right smart vending setup — from a single machine to a full micro-market.
           </p>
 
@@ -175,7 +175,7 @@ export default function ContactHero() {
             <a
               data-a="hero-cta"
               href="#contact-form"
-              className="invisible flex h-60 items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-white px-28 font-medium text-[#0f0f0f] capitalize fs-20 tracking-[-0.04em] transition-colors hover:border-brand hover:bg-sun max-lg:h-100 max-lg:px-40 max-lg:fs-30"
+              className="invisible flex h-60 items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-white px-28 font-medium text-[#0f0f0f] capitalize fs-20 tracking-[-0.04em] transition-colors hover:border-brand hover:bg-sun max-lg:h-120 max-lg:px-44 max-lg:fs-38"
             >
               <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-31 w-auto max-lg:h-44" />
               Send us a message
@@ -183,7 +183,7 @@ export default function ContactHero() {
             <a
               data-a="hero-cta"
               href="tel:+16236883769"
-              className="invisible flex h-60 items-center gap-12 rounded-[6px] border border-white/60 px-28 font-medium text-white fs-20 tracking-[-0.04em] transition-colors hover:border-sun hover:text-sun max-lg:h-100 max-lg:px-40 max-lg:fs-30"
+              className="invisible flex h-60 items-center gap-12 rounded-[6px] border border-white/60 px-28 font-medium text-white fs-20 tracking-[-0.04em] transition-colors hover:border-sun hover:text-sun max-lg:h-120 max-lg:px-44 max-lg:fs-38"
             >
               <span aria-hidden className="size-26 bg-current [mask-image:url(/images/vendiq/icon-phone-mask.png)] [mask-size:100%] max-lg:size-36" />
               (623)-688-3769

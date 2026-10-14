@@ -74,18 +74,26 @@ function ReviewCard({ r }: { r: Review }) {
 }
 
 /** Figma 466:4716 → 466:5019. Header reveals, then the card track scrubs left. */
-const build: SceneBuilder = (tl) => {
+const build: SceneBuilder = (tl, root) => {
+  const track = root.querySelector<HTMLElement>("[data-a='review-track']");
+  // Desktop: 970 Figma px of travel across a 3310 px track (Figma). Smaller
+  // screens show fewer cards at once, so travel until the last card is in view.
+  const travel = () => {
+    if (!track) return 0;
+    if (window.matchMedia("(min-width: 64rem)").matches) return -0.293 * track.offsetWidth;
+    const inset = track.offsetLeft;
+    return -Math.max(0, track.offsetWidth + inset * 2 - root.clientWidth);
+  };
   tl.fromTo("[data-a='glow']", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 })
     .fromTo("[data-a='reviews-head']", { autoAlpha: 0, yPercent: 110 }, { autoAlpha: 1, yPercent: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 0.2)
     .fromTo("[data-a='review']", { autoAlpha: 0, y: 120 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1, ease: "power2.out" }, 0.6)
-    // 970 Figma px of travel across a 3310 px track.
-    .to("[data-a='review-track']", { xPercent: -29.3, duration: 4 }, "+=0.2")
+    .to("[data-a='review-track']", { x: travel, duration: 4 }, "+=0.2")
     .to({}, { duration: 0.6 });
 };
 
 export default function Reviews() {
   return (
-    <ScrollScene id="reviews" label="Client reviews" trackClassName="h-[450vh]" stageClassName="bg-white" build={build}>
+    <ScrollScene id="reviews" label="Client reviews" trackClassName="h-[450vh]" stageClassName="bg-white" build={build} invalidateOnRefresh>
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <Image data-a="glow" src={`${A}/glow-sun.svg`} alt="" width={2526} height={2526} className="invisible absolute top-[-102%] left-[-21%] w-[127%] max-w-none opacity-60" />
         <Image data-a="glow" src={`${A}/glow-orange.svg`} alt="" width={2526} height={2526} className="invisible absolute top-[-112%] left-[-40%] w-[127%] max-w-none opacity-60" />
@@ -100,7 +108,7 @@ export default function Reviews() {
             </p>
           </div>
           <div className="overflow-hidden">
-            <h2 data-a="reviews-head" className="invisible pt-8 font-condensed font-bold text-black capitalize fs-93.25 leading-[0.825] tracking-[-0.04em]">
+            <h2 data-a="reviews-head" className="invisible pt-8 font-condensed font-bold text-black capitalize fs-93.25 leading-[0.825] tracking-[-0.04em] max-lg:fs-64 max-lg:leading-[0.9]">
               Why Businesses Choose VendIQ
             </h2>
           </div>

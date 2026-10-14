@@ -47,7 +47,7 @@ export default function AdSpace() {
         >
           <div className="mt-140 w-379 shrink-0 overflow-hidden max-lg:mt-0">
             <h2 data-a="ad-label" className="invisible flex items-start gap-14 font-bold text-[#fffcf6] uppercase fs-40 tracking-[-0.02em] max-lg:text-lg">
-              <Image src="/images/vendiq/logo-mark.png" alt="" width={112} height={85} className="mt-35 h-33 w-auto max-lg:mt-1" />
+              <Image src="/images/vendiq/logo-mark.png" alt="" width={112} height={85} className="mt-35 h-33 w-auto max-lg:mt-[4px] max-lg:h-[18px]" />
               <span>
                 Your Logo on the
                 <br />
@@ -65,9 +65,9 @@ export default function AdSpace() {
               </p>
               <Link
                 href="/contact"
-                className="mt-10 flex h-56 items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-[#1a1a1a] pr-24 pl-20 font-medium text-white capitalize fs-17 transition-colors hover:bg-brand max-lg:h-11 max-lg:text-sm"
+                className="mt-10 flex h-56 max-lg:mt-[12px] items-center gap-10 rounded-[6px] border border-[#e6e6e6] bg-[#1a1a1a] pr-24 pl-20 font-medium text-white capitalize fs-17 transition-colors hover:bg-brand max-lg:h-[44px] max-lg:px-[16px] max-lg:text-sm"
               >
-                <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-31 w-auto max-lg:h-5" />
+                <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-31 w-auto max-lg:h-[20px]" />
                 Get started
               </Link>
             </div>
@@ -84,7 +84,7 @@ export default function AdSpace() {
           width={1006}
           height={805}
           unoptimized
-          className="h-auto w-1117 max-w-none origin-top self-start max-lg:self-end"
+          className="h-auto w-1117 max-w-none origin-top self-start max-lg:w-[calc(100%-48px)] max-lg:self-end"
         />
       </div>
     </ScrollScene>

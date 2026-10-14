@@ -122,7 +122,7 @@ export default function Industries() {
             </p>
           </div>
         </div>
-        <div ref={slot} className="-mt-50 w-414 shrink-0">
+        <div ref={slot} className="-mt-50 w-414 shrink-0 max-lg:mt-[16px]">
           <div
             ref={machine}
             data-a="machine"

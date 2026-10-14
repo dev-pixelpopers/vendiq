@@ -118,7 +118,7 @@ export default function IntroHero() {
         ref={slot}
         role="img"
         aria-label="VendIQ smart vending machine stocked with drinks"
-        className="pointer-events-none absolute top-0 right-[18.7%] aspect-[624/1392] w-[634px]"
+        className="pointer-events-none absolute top-0 right-[calc(50%-601*var(--u))] aspect-[624/1392] w-634 max-lg:inset-x-0 max-lg:top-auto max-lg:bottom-[-10svh] max-lg:mx-auto max-lg:w-[min(68vw,calc(72svh*624/1392))]"
       />
 
     </ScrollScene>

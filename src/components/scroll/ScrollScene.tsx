@@ -28,6 +28,8 @@ type ScrollSceneProps = {
   stageClassName?: string;
   /** ScrollTrigger scrub smoothing in seconds (lower = snappier). */
   scrub?: number;
+  /** Re-read function-based tween values on every refresh (e.g. resize). */
+  invalidateOnRefresh?: boolean;
   /** Adds tweens to the scrubbed timeline. Selectors are scoped to the scene. */
   build: SceneBuilder;
   label: string;
@@ -43,6 +45,7 @@ export default function ScrollScene({
   trackClassName,
   stageClassName = "",
   scrub = 1,
+  invalidateOnRefresh = false,
   build,
   label,
   id,
@@ -64,6 +67,7 @@ export default function ScrollScene({
             start: "top top",
             end: "bottom bottom",
             scrub,
+            invalidateOnRefresh,
             onRefresh: jumpToScroll,
           },
         });

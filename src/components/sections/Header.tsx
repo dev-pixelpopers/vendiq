@@ -23,15 +23,15 @@ export default function Header() {
         return whenIntroDone(reveal)
     }, [])
     return (
-        <header data-a="header" className={`invisible absolute left-0 top-0 -translate-y-[137px] z-10 flex w-full items-center px-[134px] py-[40px] justify-between self-start justify-self-center z-10`} >
-            <Link href="/" aria-label="VendIQ home" className="max-lg:[--u:calc(100vw/700)]">
+        <header data-a="header" className="invisible absolute left-0 top-0 z-10 flex w-full -translate-y-[137px] items-center justify-between gap-4 self-start justify-self-center px-[clamp(20px,7vw,134px)] py-[clamp(18px,2.1vw,40px)]">
+            <Link href="/" aria-label="VendIQ home" className="shrink-0 [--u:clamp(0.5px,calc(100vw/1920),1.4px)] max-lg:[--u:clamp(0.5px,calc(100vw/700),0.9px)]">
                 <BrandMark className="fs-50" wordmarkClassName="text-white" />
             </Link>
             <Link
                 href={pathname === "/contact" ? "#contact-form" : "/contact"}
-                className="flex min-h-[max(36px,calc(56*var(--u)))] items-center gap-[10px] rounded-[6px] border border-[#e6e6e6] bg-white  px-[28px] py-[12px] font-medium text-[#0f0f0f] text-[length:max(12px,calc(20*var(--u)))] tracking-[-0.04em] transition-colors hover:border-brand"
+                className="flex min-h-[clamp(38px,2.9vw,56px)] shrink-0 items-center gap-[clamp(6px,0.6vw,10px)] whitespace-nowrap rounded-[6px] border border-[#e6e6e6] bg-white px-[clamp(12px,1.5vw,28px)] py-[clamp(6px,0.6vw,12px)] font-medium text-[#0f0f0f] text-[length:clamp(12px,1.05vw,20px)] tracking-[-0.04em] transition-colors hover:border-brand hover:bg-sun"
             >
-                <Image src={`${A}/logo-mark.png`} alt="" width={40} height={31} className="w-[40px] h-[31px]" />
+                <Image src={`${A}/logo-mark.png`} alt="" width={40} height={31} className="h-[clamp(18px,1.6vw,31px)] w-auto" />
                 Request A Machine
             </Link>
         </header>

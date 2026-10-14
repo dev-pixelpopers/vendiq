@@ -30,11 +30,12 @@ const ROWS: Field[][] = [
 const LABEL =
   "pointer-events-none absolute left-6 origin-left font-normal text-[#3d3d3d] uppercase fs-18 tracking-[0.02em] transition-transform duration-200 " +
   "peer-focus:-translate-y-26 peer-focus:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-26 peer-[:not(:placeholder-shown)]:scale-75";
-const INPUT = "peer w-full bg-transparent px-6 text-black fs-18 outline-none";
+// 16px minimum on small screens so iOS Safari doesn't zoom in on focus.
+const INPUT = "peer w-full bg-transparent px-6 text-black fs-18 outline-none max-lg:text-[16px]";
 
 function TextField({ name, label, type = "text", autoComplete }: Field) {
   return (
-    <label className="relative flex flex-col">
+    <label data-a="field" className="relative flex flex-col">
       <input
         name={name}
         type={type}
@@ -70,7 +71,7 @@ export default function ContactForm({ className = "" }: { className?: string }) 
       ))}
 
       <div className="relative mt-34 flex items-start gap-60 max-lg:flex-col max-lg:items-stretch">
-        <label className="relative flex flex-1 flex-col">
+        <label data-a="field" className="relative flex flex-1 flex-col">
           <textarea
             name="message"
             rows={2}
@@ -80,6 +81,7 @@ export default function ContactForm({ className = "" }: { className?: string }) 
           <span className={`${LABEL} top-22`}>Tell us about your space</span>
         </label>
         <button
+          data-a="submit"
           type="submit"
           className="mt-39 flex h-54 w-228 shrink-0 items-center justify-center gap-10 rounded-[4px] bg-[#212121] font-medium text-[#fbfbfb] capitalize fs-17 transition-colors hover:bg-brand max-lg:w-full"
         >

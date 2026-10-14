@@ -167,17 +167,22 @@ export default function ProductStory() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    images.current = STORY_FRAMES.map(({ src }, idx) => {
-      const img = new window.Image();
-      img.decoding = "async";
-      img.src = src;
-      img.onload = () => {
-        if (Math.round(state.current.frame) === idx || idx === 0 || idx === LAST) render();
-      };
-      return img;
-    });
-    machineImg.current = new window.Image();
-    machineImg.current.src = FOOD_SRC;
+    // ~60 MB of frames: start after `load` so they don't hold the preloader (it waits for `load`).
+    const preload = () => {
+      images.current = STORY_FRAMES.map(({ src }, idx) => {
+        const img = new window.Image();
+        img.decoding = "async";
+        img.src = src;
+        img.onload = () => {
+          if (Math.round(state.current.frame) === idx || idx === 0 || idx === LAST) render();
+        };
+        return img;
+      });
+      machineImg.current = new window.Image();
+      machineImg.current.src = FOOD_SRC;
+    };
+    if (document.readyState === "complete") preload();
+    else window.addEventListener("load", preload, { once: true });
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -188,7 +193,10 @@ export default function ProductStory() {
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
     resize();
-    return () => ro.disconnect();
+    return () => {
+      window.removeEventListener("load", preload);
+      ro.disconnect();
+    };
   }, [render]);
 
   const build: SceneBuilder = (tl, _root, { reduced }) => {
