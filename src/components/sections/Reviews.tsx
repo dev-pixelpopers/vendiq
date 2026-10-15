@@ -56,7 +56,7 @@ function ReviewCard({ r }: { r: Review }) {
   return (
     <article
       data-a="review"
-      className="invisible flex h-400 w-448 shrink-0 flex-col rounded-[10px] border border-[#eaeaea] bg-white px-28 pt-21 pb-32 text-black capitalize"
+      className="invisible flex h-400 w-448 shrink-0 flex-col justify-center rounded-[10px] border border-[#eaeaea] bg-white px-28 pt-21 pb-32 text-black capitalize"
     >
       {/* <div className="flex items-start justify-between">
         <Image src={`${A}/${r.avatar}`} alt="" width={184} height={184} className="size-92 rounded-full object-cover" />
@@ -64,7 +64,7 @@ function ReviewCard({ r }: { r: Review }) {
           <Image src={`${A}/${r.logo.src}`} alt="" width={r.logo.width} height={r.logo.height} className={`w-auto ${r.logo.className}`} />
         </div>
       </div> */}
-      <Image src={`${A}/quote-mark.png`} alt="" width={96} height={80} className="mt-63 h-40 w-48" />
+      <Image src={`${A}/quote-mark.png`} alt="" width={96} height={80} className="mt-63 h-40 w-48 hidden" />
       <h3 className="mt-37 w-301 font-bold fs-24 leading-none tracking-[-0.02em]">{r.title}</h3>
       <p className="mt-42 w-389 font-normal fs-18 leading-[1.333] tracking-[-0.02em]">{r.quote}</p>
       {/* <p className="mt-auto font-medium fs-18 leading-[1.333] tracking-[-0.02em]">{r.name}</p> */}

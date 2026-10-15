@@ -27,20 +27,11 @@ const VENUES = [
  * The machine pulls back under the title, then each venue wipes in behind it
  * with its label; the About section then slides down over it from the top.
  */
-/** Oversized entry placement (Variant65); percentages of the 414 Figma px machine box. */
-const ENTRY = { xPercent: 42.03, yPercent: -59.76, scale: 1.737 };
-
 const build: SceneBuilder = (tl) => {
-  // The travelling machine arrives at ENTRY; the in-stage copy takes over as
-  // soon as the playhead leaves 0, then settles at Variant69.
+  // The travelling machine lands straight in its slot (Variant69); the in-stage
+  // copy takes over as soon as the playhead leaves 0.
   tl.eventCallback("onUpdate", () => setTravel({ docked: tl.time() > 0.001 }));
-  tl.fromTo(
-      "[data-a='machine']",
-      ENTRY,
-      { xPercent: 0, yPercent: 0, scale: 1, duration: 2, ease: "power2.inOut" },
-      0,
-    )
-    .fromTo("[data-a='title']", { yPercent: -160 }, { yPercent: 0, duration: 1.2, ease: "power2.out" }, 1)
+  tl.fromTo("[data-a='title']", { yPercent: -160 }, { yPercent: 0, duration: 1.2, ease: "power2.out" }, 0)
     .addLabel("venues", "+=0.2")
     .to("[data-a='title']", { yPercent: -160, duration: 1, ease: "power2.in" }, "venues")
     .to("[data-a='machine']", { xPercent: -4.59, yPercent: -25.28, scale: 1.0918, duration: 1.2, ease: "power2.inOut" }, "venues")
@@ -77,14 +68,14 @@ export default function Industries() {
   const slot = useRef<HTMLDivElement>(null);
   const machine = useRef<HTMLDivElement>(null);
 
-  // Where the travelling machine lands: the slot's layout box with ENTRY applied.
+  // Where the travelling machine lands: the slot's layout box.
   useEffect(() => {
     const el = slot.current;
     const img = machine.current;
     if (!el || !img) return;
     const offPose = registerPose("industries", () => {
       const r = rectInStage(el);
-      return poseFromBox(r.x + (ENTRY.xPercent / 100) * r.w, r.y + (ENTRY.yPercent / 100) * r.h, r.w * ENTRY.scale);
+      return poseFromBox(r.x, r.y, r.w);
     });
     const offDock = registerDock(img);
     return () => {
@@ -122,7 +113,8 @@ export default function Industries() {
             </p>
           </div>
         </div>
-        <div ref={slot} className="-mt-50 w-414 shrink-0 max-lg:mt-[16px]">
+        {/* Mobile: wide enough that the machine fills ~¾ of the screen height, as on desktop */}
+        <div ref={slot} className="-mt-50 w-414 shrink-0 max-lg:mt-[60px] max-lg:w-650">
           <div
             ref={machine}
             data-a="machine"

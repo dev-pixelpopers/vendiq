@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
+import Link from "next/link";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import BrandMark from "@/components/brand/BrandMark";
@@ -53,7 +54,10 @@ export default function SiteFooter({ className = "" }: { className?: string }) {
     <footer ref={footer} className={`relative isolate flex flex-col items-center pb-25 text-[#fbfbfb] ${className}`}>
       <div data-a="footer-bg" aria-hidden className="bg-ember-radial absolute inset-0 -z-10" />
       <div data-a="footer-content" className="flex w-1093 items-center justify-between max-lg:w-full max-lg:flex-col max-lg:items-start max-lg:gap-24 max-lg:px-24">
-        <BrandMark className="fs-83" wordmarkClassName="text-white" />
+        {/* <BrandMark className="fs-83" wordmarkClassName="text-white" /> */}
+        <Link href="/" aria-label="VendIQ home" className="shrink-0 [--u:clamp(0.5px,calc(100vw/1920),1.4px)] max-lg:[--u:clamp(0.5px,calc(100vw/700),0.9px)]">
+          <BrandMark className="fs-83" wordmarkClassName="text-white" />
+        </Link>
         <div className="mt-22 mr-16 flex items-center gap-62 font-medium capitalize fs-20 max-lg:mt-0 max-lg:mr-0 max-lg:flex-col max-lg:items-start max-lg:gap-12">
           <a href="mailto:info@vendiq.net" className="flex items-center gap-13 hover:text-sun">
             <span aria-hidden className="size-34 bg-white [mask-image:url(/images/vendiq/icon-mail-mask.png)] [mask-size:100%]" />

@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,42 +9,58 @@ import ScrollScene, { FRAME, LAYER, type SceneBuilder } from "@/components/scrol
 const A = "/images/vendiq";
 
 type Callout = {
-  text: string;
+  /** One entry per line, so the text box is exactly as wide as its longest line. */
+  lines: string[];
   /** Figma offsets: left indent from the column edge, gap from previous item. */
   indent: string;
   gap: string;
   textWidth: string;
-  connector: { src: string; width: number; className: string };
+  /** Connector, in Figma px: how far it runs past the text towards the dot, and its top edge. */
+  reach: number;
+  top: number;
 };
 
 const LEFT: Callout[] = [
-  { text: "Smarter Vending. Better Experience", indent: "ml-99", gap: "", textWidth: "w-311", connector: { src: "connector-left-1.svg", width: 391, className: "left-15 -top-19 w-391" } },
-  { text: "Built for Modern Workplaces", indent: "ml-0", gap: "mt-110", textWidth: "w-352", connector: { src: "connector-left-2.svg", width: 340, className: "left-86 -top-23 w-340" } },
-  { text: "Smart Inventory Tracking", indent: "ml-93", gap: "mt-93", textWidth: "w-308", connector: { src: "connector-left-3.svg", width: 296, className: "left-98 -top-18 w-296" } },
+  { lines: ["Smarter Vending.", "Better Experience"], indent: "ml-99", gap: "", textWidth: "w-311", reach: 95, top: -19 },
+  { lines: ["Built for Modern", "Workplaces"], indent: "ml-0", gap: "mt-110", textWidth: "w-352", reach: 74, top: -23 },
+  { lines: ["Smart Inventory", "Tracking"], indent: "ml-93", gap: "mt-93", textWidth: "w-308", reach: 86, top: -18 },
 ];
 
 const RIGHT: Callout[] = [
-  { text: "HD Digital Display", indent: "ml-0", gap: "", textWidth: "w-196", connector: { src: "connector-right.svg", width: 238, className: "-left-49 top-1 w-238" } },
-  { text: "Digital Price Tags", indent: "ml-55", gap: "mt-72", textWidth: "w-217", connector: { src: "connector-right.svg", width: 238, className: "-left-30 top-0 w-238" } },
-  { text: "POS with Smart Lock", indent: "ml-65", gap: "mt-82", textWidth: "w-278", connector: { src: "connector-right.svg", width: 238, className: "-left-47 top-2 w-238" } },
-  { text: "Cellular, WiFi Included", indent: "ml-25", gap: "mt-82", textWidth: "w-282", connector: { src: "connector-right-long.svg", width: 319, className: "-left-70 top-0 w-319" } },
+  { lines: ["HD Digital", "Display"], indent: "ml-0", gap: "", textWidth: "w-196", reach: 49, top: 1 },
+  { lines: ["Digital Price", "Tags"], indent: "ml-55", gap: "mt-72", textWidth: "w-217", reach: 30, top: 0 },
+  { lines: ["POS with Smart", "Lock"], indent: "ml-65", gap: "mt-82", textWidth: "w-278", reach: 47, top: 2 },
+  { lines: ["Cellular, WiFi", "Included"], indent: "ml-25", gap: "mt-82", textWidth: "w-282", reach: 70, top: 0 },
 ];
+
+/**
+ * Connector drawn around the text box (was an SVG): a line from the dot along
+ * the text, turning through a 30px corner and ending 20px past the text.
+ * Left: along the top, turning down past the text's left edge.
+ * Right: along the bottom, turning up past the text's right edge.
+ */
+const CONNECTOR = {
+  left: "before:-left-20 before:right-[calc(var(--spacing)*var(--reach)*-1)] before:border-t before:border-l before:border-sun before:rounded-tl-[calc(var(--spacing)*30)]",
+  right: "before:-right-20 before:left-[calc(var(--spacing)*var(--reach)*-1)] before:border-b before:border-r before:border-brand before:rounded-br-[calc(var(--spacing)*30)]",
+};
 
 function CalloutItem({ c, side }: { c: Callout; side: "left" | "right" }) {
   return (
     <li
       data-a={`callout-${side}`}
-      className={`invisible relative ${c.indent} ${c.gap} ${c.textWidth} font-bold text-white capitalize fs-30 leading-[0.934] tracking-[-0.02em] ${side === "left" ? "text-right" : ""} max-lg:m-0 max-lg:w-auto max-lg:text-left max-lg:text-base`}
+      className={`invisible flex ${c.indent} ${c.gap} ${c.textWidth} font-bold text-white capitalize fs-30 leading-[0.934] tracking-[-0.02em] ${side === "left" ? "justify-end text-right" : ""} max-lg:m-0 max-lg:w-auto max-lg:text-left max-lg:text-base`}
     >
-      <Image
-        data-a="connector"
-        src={`${A}/${c.connector.src}`}
-        alt=""
-        width={c.connector.width}
-        height={71}
-        className={`pointer-events-none absolute h-71 max-w-none ${side === "left" ? "rotate-180" : ""} ${c.connector.className} max-lg:hidden`}
-      />
-      <span className="relative">{c.text}</span>
+      <span
+        style={{ "--reach": c.reach, "--top": c.top } as CSSProperties}
+        className={`relative w-max before:pointer-events-none before:absolute before:top-[calc(var(--spacing)*var(--top))] before:h-71 before:content-[''] ${CONNECTOR[side]} max-lg:w-auto max-lg:before:hidden`}
+      >
+        {c.lines.map((line, i) => (
+          <span key={line} className="block max-lg:inline">
+            {i > 0 && <span className="hidden max-lg:inline"> </span>}
+            {line}
+          </span>
+        ))}
+      </span>
     </li>
   );
 }
@@ -70,6 +87,20 @@ const HALF = {
   /** Merged wordmark lifts 242px: top half leaves (→ -230), bottom half sits on the top edge (→ -26). */
   lifted: -280.9,
 };
+
+const WM_TOP = "[data-a='wordmark-top']";
+const WM_BOTTOM = "[data-a='wordmark-bottom']";
+
+/**
+ * Mobile wordmark: fits the screen width and is centred vertically, so offsets
+ * depend on the stage height. Parted, each half sits EDGE of the stage height in
+ * from its edge; lifted, the bottom half sits on the top edge with LIFT_HIDE of
+ * its height cut off (as on desktop).
+ */
+const EDGE = 0.03;
+const LIFT_HIDE = 0.13;
+const mobileWordmark = (fn: (h: number, H: number) => number) => (_: number, el: HTMLElement) =>
+  fn(el.offsetHeight, el.parentElement?.offsetHeight ?? window.innerHeight);
 
 /**
  * The track overlaps the last 200vh of Industries (`-mt-[200vh]`): once this
@@ -112,8 +143,6 @@ const build: SceneBuilder = (tl, root, { reduced }) => {
     .fromTo("[data-a='wordmark-top']", { xPercent: -150 }, { xPercent: 0, duration: 1.4, ease: "power3.out" }, "in")
     .fromTo("[data-a='wordmark-bottom']", { xPercent: 150 }, { xPercent: 0, duration: 1.4, ease: "power3.out" }, "in")
     .addLabel("part", "+=0.4")
-    .to("[data-a='wordmark-top']", { yPercent: HALF.topParted, duration: 1.2, ease: "power2.inOut" }, "part")
-    .to("[data-a='wordmark-bottom']", { yPercent: HALF.bottomParted, duration: 1.2, ease: "power2.inOut" }, "part")
     .fromTo("[data-a='glow']", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2 }, "part+=0.4")
     .fromTo(
       "[data-a='who-line']",
@@ -132,29 +161,57 @@ const build: SceneBuilder = (tl, root, { reduced }) => {
     )
     // …then the bottom half rises to meet the parked top half, re-forming the wordmark…
     .addLabel("merge", "exit+=1.2")
-    .to("[data-a='wordmark-bottom']", { yPercent: HALF.topParted, duration: 1.2, ease: "power2.inOut" }, "merge")
     // …and the merged wordmark lifts together until only the bottom half shows on the top edge.
     .addLabel("lift", "merge+=1.3")
-    .to(["[data-a='wordmark-top']", "[data-a='wordmark-bottom']"], { yPercent: HALF.lifted, duration: 1, ease: "power2.inOut" }, "lift")
     .addLabel("why", "lift+=0.6")
     .fromTo("[data-a='why-heading']", { autoAlpha: 0, yPercent: -60 }, { autoAlpha: 1, yPercent: 0, duration: 0.8 }, "why")
-    .fromTo("[data-a='pantry']", { autoAlpha: 0, yPercent: 45 }, { autoAlpha: 1, yPercent: 0, duration: 1.4, ease: "power3.out" }, "why")
+    .fromTo("[data-a='pantry']", { autoAlpha: 0, yPercent: 45 }, { autoAlpha: 1, yPercent: 0, duration: 1.4, ease: "power3.out" }, "why");
+
+  const mm = gsap.matchMedia(root);
+  const move = { duration: 1.2, ease: "power2.inOut" };
+
+  mm.add("(min-width: 64rem)", () => {
+    tl.to(WM_TOP, { yPercent: HALF.topParted, ...move }, "part")
+      .to(WM_BOTTOM, { yPercent: HALF.bottomParted, ...move }, "part")
+      .to(WM_BOTTOM, { yPercent: HALF.topParted, ...move }, "merge")
+      .to([WM_TOP, WM_BOTTOM], { yPercent: HALF.lifted, ...move, duration: 1 }, "lift");
+
     // Arcs wipe outward from the machine: left arc right → left, right arc left → right.
-    .fromTo(
+    tl.fromTo(
       "[data-a='arc-left']",
       { autoAlpha: 1, clipPath: "inset(0% 0% 0% 100%)" },
       { clipPath: "inset(0% 0% 0% 0%)", duration: 1.2, ease: "power2.inOut" },
       "why+=0.6",
     )
-    .fromTo(
-      "[data-a='arc-right']",
-      { autoAlpha: 1, clipPath: "inset(0% 100% 0% 0%)" },
-      { clipPath: "inset(0% 0% 0% 0%)", duration: 1.2, ease: "power2.inOut" },
-      "why+=0.6",
-    )
-    .fromTo("[data-a='callout-left']", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "why+=1.4")
-    .fromTo("[data-a='callout-right']", { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "why+=1.5")
-    .to({}, { duration: 1.2 });
+      .fromTo(
+        "[data-a='arc-right']",
+        { autoAlpha: 1, clipPath: "inset(0% 100% 0% 0%)" },
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.2, ease: "power2.inOut" },
+        "why+=0.6",
+      )
+      .fromTo("[data-a='callout-left']", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "why+=1.4")
+      .fromTo("[data-a='callout-right']", { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "why+=1.5")
+      .to({}, { duration: 1.2 });
+  });
+
+  // Mobile, no arcs: the first three sit left of the machine; then the machine
+  // crosses to the left half and the other four take the right.
+  mm.add("(width < 64rem)", () => {
+    // The wordmark starts centred; offsets are px from there, measured from the stage height.
+    tl.to(WM_TOP, { y: mobileWordmark((h, H) => EDGE * H - (H / 2 - h)), ...move }, "part")
+      .to(WM_BOTTOM, { y: mobileWordmark((h, H) => H / 2 - EDGE * H - h), ...move }, "part")
+      .to(WM_BOTTOM, { y: mobileWordmark((h, H) => EDGE * H + h - H / 2), ...move }, "merge")
+      .to([WM_TOP, WM_BOTTOM], { y: mobileWordmark((h, H) => -LIFT_HIDE * h - H / 2), ...move, duration: 1 }, "lift");
+
+    tl.fromTo("[data-a='callout-left']", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "why+=1")
+      .addLabel("swap", "why+=2.8")
+      .to("[data-a='callout-left']", { autoAlpha: 0, x: -40, duration: 0.6, stagger: 0.1, ease: "power2.in" }, "swap")
+      .fromTo("[data-a='pantry-slot']", { xPercent: 0 }, { xPercent: -100, duration: 1.2, ease: "power2.inOut" }, "swap+=0.3")
+      .fromTo("[data-a='callout-right']", { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "swap+=1.1")
+      .to({}, { duration: 1.2 });
+  });
+
+  return () => mm.revert();
 };
 
 export default function BrandStory() {
@@ -164,6 +221,7 @@ export default function BrandStory() {
       label="About VendIQ"
       trackClassName="-mt-[200vh] h-[900vh]"
       stageClassName="invisible bg-ember-linear"
+      invalidateOnRefresh
       build={build}
     >
       {/* Warm glows (decorative) */}
@@ -174,16 +232,23 @@ export default function BrandStory() {
 
       {/* Outline wordmark, split at its midline into two halves (decorative) */}
       <div aria-hidden className={`${FRAME} pointer-events-none`}>
-        <div data-a="wordmark-top" className="absolute top-343 left-145 h-204 w-1567 overflow-hidden">
-          <Image src={`${A}/outline-wordmark-top.svg`} alt="" width={1567} height={409} className="h-408.5 w-1567 max-w-none" />
+        {/* Mobile: scaled to 920 units wide (204 → 119.75 tall per half), centred vertically */}
+        <div
+          data-a="wordmark-top"
+          className="absolute top-343 left-145 h-204 w-1567 overflow-hidden max-lg:top-[calc(50%-var(--spacing)*119.75)] max-lg:left-40 max-lg:h-119.75 max-lg:w-920"
+        >
+          <Image src={`${A}/outline-wordmark-top.svg`} alt="" width={1567} height={409} className="h-408.5 w-1567 max-w-none max-lg:h-239.75 max-lg:w-920" />
         </div>
-        <div data-a="wordmark-bottom" className="absolute top-547 left-145 h-204 w-1567 overflow-hidden">
-          <Image src={`${A}/outline-wordmark-bottom.svg`} alt="" width={1567} height={408} className="-mt-204 h-408 w-1567 max-w-none" />
+        <div
+          data-a="wordmark-bottom"
+          className="absolute top-547 left-145 h-204 w-1567 overflow-hidden max-lg:top-1/2 max-lg:left-40 max-lg:h-119.75 max-lg:w-920"
+        >
+          <Image src={`${A}/outline-wordmark-bottom.svg`} alt="" width={1567} height={408} className="-mt-204 h-408 w-1567 max-w-none max-lg:-mt-119.75 max-lg:h-239.5 max-lg:w-920" />
         </div>
       </div>
 
       {/* Who we are */}
-      <div className={`${FRAME} flex items-start pt-286 pl-179 max-lg:flex-col max-lg:gap-40 max-lg:px-60 max-lg:pt-240`}>
+      <div className={`${FRAME} flex items-start pt-286 pl-179 max-lg:flex-col max-lg:justify-center max-lg:gap-40 max-lg:px-60 max-lg:pt-0`}>
         <div className="mt-59 w-501 shrink-0 overflow-hidden max-lg:mt-0">
           <div data-a="who-line" className="invisible">
             <Eyebrow className="fs-40 max-lg:text-sm">Who we are</Eyebrow>
@@ -209,17 +274,21 @@ export default function BrandStory() {
       </div>
 
       {/* Why choose Vend IQ */}
-      <div className={`${FRAME} grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] max-lg:flex max-lg:flex-col max-lg:items-center max-lg:gap-40 max-lg:pt-160`}>
-        <div className={`${LAYER} flex justify-center pt-170`}>
-          <h2 data-a="why-heading" className="invisible max-lg:order-first">
-            <Eyebrow className="fs-36">Why choose vend iQ</Eyebrow>
+      {/* Mobile: two halves; the machine starts on the right and later crosses to the left. */}
+      <div className={`${FRAME} grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)]`}>
+        <div className={`${LAYER} flex justify-center pt-170 max-lg:pt-260`}>
+          <h2 data-a="why-heading" className="invisible">
+            <Eyebrow className="fs-36 max-lg:text-sm">Why choose vend iQ</Eyebrow>
           </h2>
         </div>
 
-        <div className={`${LAYER} flex justify-center pt-230 max-lg:pt-0`}>
-          <div className="relative w-384.75">
-            <Image data-a="arc-left" src={`${A}/arc-left.svg`} alt="" width={508} height={532} className="invisible absolute top-62 -left-204 h-532 w-508 max-w-none" />
-            <Image data-a="arc-right" src={`${A}/arc-right.svg`} alt="" width={509} height={634} className="invisible absolute top-101 left-57 h-634 w-509 max-w-none" />
+        <div
+          data-a="pantry-slot"
+          className={`${LAYER} flex justify-center pt-230 max-lg:w-1/2 max-lg:items-center max-lg:justify-self-end max-lg:pt-120`}
+        >
+          <div className="relative w-384.75 max-lg:w-auto">
+            <Image data-a="arc-left" src={`${A}/arc-left.svg`} alt="" width={508} height={532} className="invisible absolute top-62 -left-204 h-532 w-508 max-w-none max-lg:hidden" />
+            <Image data-a="arc-right" src={`${A}/arc-right.svg`} alt="" width={509} height={634} className="invisible absolute top-101 left-57 h-634 w-509 max-w-none max-lg:hidden" />
             <Image
               data-a="pantry"
               src={`${A}/machine-pantry.webp`}
@@ -227,19 +296,19 @@ export default function BrandStory() {
               width={532}
               height={1315}
               sizes="(min-width: 1024px) 20vw, 40vw"
-              className="invisible relative h-863 w-auto max-w-none"
+              className="invisible relative h-863 w-auto max-w-none max-lg:h-1150"
             />
           </div>
         </div>
 
-        <ul className={`${LAYER} flex flex-col items-start pt-381 pl-193 max-lg:gap-12 max-lg:p-0`}>
+        <ul className={`${LAYER} flex flex-col items-start pt-381 pl-193 max-lg:w-1/2 max-lg:justify-center max-lg:gap-60 max-lg:pt-120 max-lg:pr-30 max-lg:pl-60`}>
           {LEFT.map((c) => (
-            <CalloutItem key={c.text} c={c} side="left" />
+            <CalloutItem key={c.lines.join(" ")} c={c} side="left" />
           ))}
         </ul>
-        <ul className={`${LAYER} flex flex-col items-start pt-417 pl-1282 max-lg:gap-12 max-lg:p-0`}>
+        <ul className={`${LAYER} flex flex-col items-start pt-417 pl-1282 max-lg:w-1/2 max-lg:justify-self-end max-lg:justify-center max-lg:gap-60 max-lg:pt-120 max-lg:pr-60 max-lg:pl-30`}>
           {RIGHT.map((c) => (
-            <CalloutItem key={c.text} c={c} side="right" />
+            <CalloutItem key={c.lines.join(" ")} c={c} side="right" />
           ))}
         </ul>
       </div>

@@ -24,22 +24,35 @@ const build: SceneBuilder = (tl, root) => {
     gsap.set(trio, { clipPath: `inset(0% 0% ${cut}% 0% round 29px 30px 0 0)` });
   };
 
-  tl.fromTo("[data-a='ad-card']", { yPercent: 128 }, { yPercent: 0, duration: 1.6, ease: "power2.inOut" })
-    .fromTo(
+  tl.fromTo("[data-a='ad-card']", { yPercent: 128 }, { yPercent: 0, duration: 1.6, ease: "power2.inOut" });
+
+  const mm = gsap.matchMedia(root);
+  const sink = { scale: 1, duration: 1.6, ease: "power2.inOut", onUpdate: clipToCard };
+  mm.add("(min-width: 64rem)", () => {
+    // Variant31: 1013 px wide at y=186 → Variant33: 1117 px wide at y=607, cropped at the card edge.
+    tl.fromTo("[data-a='trio']", { yPercent: -48.1, scale: 0.907 }, { yPercent: 0, ...sink }, 0);
+  });
+  mm.add("(width < 64rem)", () => {
+    // Starts at the top of the screen (its container's top padding) and sinks to
+    // its resting place on the card's bottom edge.
+    tl.fromTo(
       "[data-a='trio']",
-      // Variant31: 1013 px wide at y=186 → Variant33: 1117 px wide at y=607, cropped at the card edge.
-      { yPercent: -48.1, scale: 0.907 },
-      { yPercent: 0, scale: 1, duration: 1.6, ease: "power2.inOut", onUpdate: clipToCard },
+      { y: (_: number, el: HTMLElement) => parseFloat(getComputedStyle(el.parentElement!).paddingTop) - el.offsetTop, scale: 0.907 },
+      { y: 0, ...sink },
       0,
-    )
-    .fromTo("[data-a='ad-panel']", { yPercent: 100 }, { yPercent: 0, duration: 1.1, ease: "power3.out" }, 1.2)
+    );
+  });
+
+  tl.fromTo("[data-a='ad-panel']", { yPercent: 100 }, { yPercent: 0, duration: 1.1, ease: "power3.out" }, 1.2)
     .fromTo("[data-a='ad-label']", { autoAlpha: 0, yPercent: 110 }, { autoAlpha: 1, yPercent: 0, duration: 0.8, ease: "power2.out" }, 1.4)
     .to({}, { duration: 1.4 });
+
+  return () => mm.revert();
 };
 
 export default function AdSpace() {
   return (
-    <ScrollScene id="ad-space" label="Ad space on LCD screen" trackClassName="h-[350vh]" stageClassName="bg-white" build={build}>
+    <ScrollScene id="ad-space" label="Ad space on LCD screen" trackClassName="h-[350vh]" stageClassName="bg-white" invalidateOnRefresh build={build}>
       <div className={`${FRAME} flex justify-center pt-50 max-lg:px-24 max-lg:pt-120`}>
         <div
           data-a="ad-card"
@@ -76,7 +89,7 @@ export default function AdSpace() {
       </div>
 
       {/* Product shot overlapping the card's bottom edge */}
-      <div className={`${FRAME} pointer-events-none flex justify-center pt-607 max-lg:items-end max-lg:pb-40`}>
+      <div className={`${FRAME} pointer-events-none flex justify-center pt-607 max-lg:items-end max-lg:pt-120 max-lg:pb-40`}>
         <Image
           data-a="trio"
           src="/videos/VendIQ-VIDEO.gif"

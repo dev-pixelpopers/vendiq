@@ -86,6 +86,9 @@ const travel = {
 /** Share of the pull-back curve covered inside the product story. */
 const ZOOM_SPLIT = 0.6;
 
+/** Extra drop (screen px) of the drinks machine in the hero, scrolled away by the glide. */
+const HERO_DROP = 30;
+
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Linear move between two poses. */
@@ -139,6 +142,8 @@ export function applyTravel() {
   if (foodEl) gsap.set(foodEl, { autoAlpha: food ? 1 : 0 });
   const pose = currentPose();
   if (!pose) return;
+  // Hero sits the drinks machine 30 screen px lower; that offset closes as it glides into the story.
+  if (drinkEl) gsap.set(drinkEl, { y: (HERO_DROP * (travel.reduced ? 1 : 1 - travel.glide)) / pose.s });
   // The story canvas owns the machine from reveal until its pull-back crossfade completes.
   const opacity = travel.reduced ? 1 : travel.docked ? 0 : travel.reveal < 1 || travel.mix >= 1 ? 1 : 0;
   gsap.set(outer, { x: pose.x, y: pose.y, scale: pose.s, autoAlpha: opacity });

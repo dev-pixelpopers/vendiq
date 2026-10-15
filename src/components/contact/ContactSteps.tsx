@@ -40,9 +40,9 @@ export default function ContactSteps() {
         const tl = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
-            trigger: "[data-a='steps']",
-            start: "top 75%",
-            end: "bottom 40%",
+            trigger: "[data-a='steps-card']",
+            start: "top 85%",
+            end: "bottom bottom",
             scrub: 0.4,
             onRefresh: jumpToScroll,
           },

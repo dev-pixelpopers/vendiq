@@ -8,7 +8,7 @@ import SiteFooter from "@/components/sections/SiteFooter";
  */
 export default function ContactFooter() {
   return (
-    <div className="flow-units">
+    <div className="flow-units fit-fold">
       <ContactFormSection id="contact" heading={["Ready to upgrade", "your space?"]} className="pt-225 max-lg:pt-80" glow />
       <SiteFooter className="-mt-180 pt-250 max-lg:-mt-0 max-lg:pt-60" />
     </div>

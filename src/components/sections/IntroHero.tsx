@@ -100,7 +100,7 @@ export default function IntroHero() {
 
       {/* Headline + machine */}
       <div className={`${FRAME} flex items-center pl-175 max-lg:flex-col max-lg:px-60`}>
-        <h1 className="flex w-769 shrink-0 flex-col uppercase max-lg:w-full max-lg:pt-220">
+        <h1 className="flex w-769 shrink-0 flex-col uppercase max-lg:w-full max-lg:pt-400">
           {/* <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
             Smart
           </span> */}

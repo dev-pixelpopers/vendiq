@@ -60,6 +60,18 @@ body {
   }
 }
 
+/*
+ * Flow block that must fit in one screen (contact card + footer, ~1060 Figma
+ * px tall, plus breathing room): on desktop, also shrink with the viewport
+ * height so short screens (1280×720, 1366×768, 1440/1600×900 minus browser
+ * chrome) show it whole.
+ */
+@media (width >= 64rem) {
+  .flow-units.fit-fold {
+    --u: min(calc(100vw / 1920), calc(100vh / 1100));
+  }
+}
+
 @utility fs-* {
   font-size: calc(var(--u, 1px) * --value(number));
 }
