@@ -162,8 +162,8 @@ export default function ContactDetails() {
       <div className="mx-auto w-1568 max-lg:w-full max-lg:px-24">
         <header className="flex items-end gap-162 max-lg:flex-col max-lg:items-start max-lg:gap-12">
           <div className="overflow-hidden">
-            <p data-a="details-head" className="invisible flex shrink-0 items-center gap-15 pb-12 font-bold text-graphite uppercase fs-40 tracking-[-0.02em]">
-              <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-33 w-auto" />
+            <p data-a="details-head" className="invisible flex shrink-0 items-center gap-15 pb-12 font-bold text-graphite uppercase fs-40 tracking-[-0.02em] max-lg:fs-28">
+              <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-33 w-auto max-lg:h-24" />
               Contact details
             </p>
           </div>
@@ -171,7 +171,7 @@ export default function ContactDetails() {
             <h2
               id="details-heading"
               data-a="details-head"
-              className="invisible pt-8 font-condensed font-bold text-black uppercase fs-93 leading-[0.825] tracking-[-0.04em]"
+              className="invisible pt-8 font-condensed font-bold text-black uppercase fs-93 leading-[0.825] tracking-[-0.04em] max-lg:fs-58 max-lg:leading-[0.9]"
             >
               We’re one tap away
             </h2>

@@ -21,6 +21,7 @@ import {
   frameScale,
   frameToStage,
 } from "./story-frames";
+import { storyImages } from "./story-loader";
 
 const LAST = STORY_FRAMES.length - 1;
 /** Last-frame source px per overlay box px (the food machine is the same image in both). */
@@ -114,10 +115,10 @@ export default function ProductStory() {
     const img = images.current[t > 0.5 && images.current[next]?.complete ? next : i];
     if (!img?.complete || !img.naturalWidth) return;
 
-    const { desktop, s, ox, oy } = fitStage(W, H);
     const x = a.x + (b.x - a.x) * t;
     const y = a.y + (b.y - a.y) * t;
     const w = a.w + (b.w - a.w) * t;
+    const { desktop, s, ox, oy } = fitStage(W, H, x + w / 2);
     const h = a.h + (b.h - a.h) * t;
     const clip = desktop ? a.clip + (b.clip - a.clip) * t : 0;
 
@@ -168,16 +169,20 @@ export default function ProductStory() {
     if (!canvas) return;
 
     // ~60 MB of frames: start after `load` so they don't hold the preloader (it waits for `load`).
+    // On mobile the loading screen in front of the preloader has already fetched them all.
     const preload = () => {
-      images.current = STORY_FRAMES.map(({ src }, idx) => {
-        const img = new window.Image();
-        img.decoding = "async";
-        img.src = src;
-        img.onload = () => {
-          if (Math.round(state.current.frame) === idx || idx === 0 || idx === LAST) render();
-        };
-        return img;
+      images.current = storyImages();
+      images.current.forEach((img, idx) => {
+        if (img.complete) return;
+        img.addEventListener(
+          "load",
+          () => {
+            if (Math.round(state.current.frame) === idx || idx === 0 || idx === LAST) render();
+          },
+          { once: true },
+        );
       });
+      render();
       machineImg.current = new window.Image();
       machineImg.current.src = FOOD_SRC;
     };

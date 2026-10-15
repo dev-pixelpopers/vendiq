@@ -163,18 +163,22 @@ const build: SceneBuilder = (tl, root, { reduced }) => {
     .addLabel("merge", "exit+=1.2")
     // …and the merged wordmark lifts together until only the bottom half shows on the top edge.
     .addLabel("lift", "merge+=1.3")
-    .addLabel("why", "lift+=0.6")
-    .fromTo("[data-a='why-heading']", { autoAlpha: 0, yPercent: -60 }, { autoAlpha: 1, yPercent: 0, duration: 0.8 }, "why")
-    .fromTo("[data-a='pantry']", { autoAlpha: 0, yPercent: 45 }, { autoAlpha: 1, yPercent: 0, duration: 1.4, ease: "power3.out" }, "why");
+    .addLabel("why", "lift+=0.6");
 
   const mm = gsap.matchMedia(root);
   const move = { duration: 1.2, ease: "power2.inOut" };
+  const heading = (at: string) =>
+    tl.fromTo("[data-a='why-heading']", { autoAlpha: 0, yPercent: -60 }, { autoAlpha: 1, yPercent: 0, duration: 0.8 }, at);
+  const pantry = (at: string) =>
+    tl.fromTo("[data-a='pantry']", { autoAlpha: 0, yPercent: 45 }, { autoAlpha: 1, yPercent: 0, duration: 1.4, ease: "power3.out" }, at);
 
   mm.add("(min-width: 64rem)", () => {
     tl.to(WM_TOP, { yPercent: HALF.topParted, ...move }, "part")
       .to(WM_BOTTOM, { yPercent: HALF.bottomParted, ...move }, "part")
       .to(WM_BOTTOM, { yPercent: HALF.topParted, ...move }, "merge")
       .to([WM_TOP, WM_BOTTOM], { yPercent: HALF.lifted, ...move, duration: 1 }, "lift");
+    heading("why");
+    pantry("why");
 
     // Arcs wipe outward from the machine: left arc right → left, right arc left → right.
     tl.fromTo(
@@ -203,12 +207,19 @@ const build: SceneBuilder = (tl, root, { reduced }) => {
       .to(WM_BOTTOM, { y: mobileWordmark((h, H) => EDGE * H + h - H / 2), ...move }, "merge")
       .to([WM_TOP, WM_BOTTOM], { y: mobileWordmark((h, H) => -LIFT_HIDE * h - H / 2), ...move, duration: 1 }, "lift");
 
-    tl.fromTo("[data-a='callout-left']", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "why+=1")
-      .addLabel("swap", "why+=2.8")
+    // No empty screen while the wordmark re-forms and lifts: the machine and the
+    // first callouts come in as the bottom half starts rising; the heading waits
+    // until the merged wordmark has lifted clear of its spot.
+    pantry("merge");
+    heading("lift+=0.2");
+    tl.fromTo("[data-a='callout-left']", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "merge+=0.8")
+      .addLabel("swap", "merge+=3")
       .to("[data-a='callout-left']", { autoAlpha: 0, x: -40, duration: 0.6, stagger: 0.1, ease: "power2.in" }, "swap")
       .fromTo("[data-a='pantry-slot']", { xPercent: 0 }, { xPercent: -100, duration: 1.2, ease: "power2.inOut" }, "swap+=0.3")
       .fromTo("[data-a='callout-right']", { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, "swap+=1.1")
-      .to({}, { duration: 1.2 });
+      // Longer final hold keeps the timeline about as long as before, so the
+      // section's slide-in (ARRIVE) still spans roughly the same scroll.
+      .to({}, { duration: 2.9 });
   });
 
   return () => mm.revert();

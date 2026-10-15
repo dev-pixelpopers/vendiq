@@ -132,7 +132,7 @@ export default function ContactHero() {
 
       {/* Machine */}
       <div aria-hidden className={`${FRAME} pointer-events-none`}>
-        <div data-a="hero-machine" className="absolute top-130 right-260 w-540 max-lg:top-auto max-lg:right-[6%] max-lg:bottom-[-12svh] max-lg:w-[min(50%,calc(40svh*624/1392))]">
+        <div data-a="hero-machine" className="absolute top-130 right-260 w-540 max-lg:hidden">
           <div data-depth="28">
             <Image
               data-a="machine"
@@ -149,7 +149,7 @@ export default function ContactHero() {
       </div>
 
       {/* Headline, intro + quick actions */}
-      <div className={`${FRAME} flex items-start pl-175 max-lg:px-60`}>
+      <div className={`${FRAME} flex items-start pl-175 max-lg:flex-col max-lg:px-60`}>
         <div data-a="hero-copy" className="flex flex-col pt-250 max-lg:pt-[max(110px,18svh)]">
           <h1 id="contact-hero-heading" className="flex w-769 flex-col uppercase max-lg:w-full">
             <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
@@ -189,6 +189,20 @@ export default function ContactHero() {
               (623)-688-3769
             </a>
           </div>
+        </div>
+
+        {/* Mobile machine: centred right under the copy, big enough to fill the rest of the screen (cropped by its bottom edge) */}
+        <div data-a="hero-machine" aria-hidden className="mt-56 w-[min(68vw,300px)] shrink-0 self-center lg:hidden">
+          <Image
+            data-a="machine"
+            src={MACHINE_SRC}
+            alt=""
+            width={MACHINE_W}
+            height={MACHINE_H}
+            loading="eager"
+            sizes="70vw"
+            className="invisible h-auto w-full"
+          />
         </div>
       </div>
     </section>

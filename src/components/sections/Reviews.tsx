@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import ScrollScene, { FRAME, type SceneBuilder } from "@/components/scroll/ScrollScene";
+import gsap from "gsap";
+import ScrollScene, { FRAME, jumpToScroll, type SceneBuilder } from "@/components/scroll/ScrollScene";
 
 const A = "/images/vendiq";
 
@@ -74,7 +75,7 @@ function ReviewCard({ r }: { r: Review }) {
 }
 
 /** Figma 466:4716 → 466:5019. Header reveals, then the card track scrubs left. */
-const build: SceneBuilder = (tl, root) => {
+const build: SceneBuilder = (tl, root, { reduced }) => {
   const track = root.querySelector<HTMLElement>("[data-a='review-track']");
   // Desktop: 970 Figma px of travel across a 3310 px track (Figma). Smaller
   // screens show fewer cards at once, so travel until the last card is in view.
@@ -84,11 +85,30 @@ const build: SceneBuilder = (tl, root) => {
     const inset = track.offsetLeft;
     return -Math.max(0, track.offsetWidth + inset * 2 - root.clientWidth);
   };
-  tl.fromTo("[data-a='glow']", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 })
-    .fromTo("[data-a='reviews-head']", { autoAlpha: 0, yPercent: 110 }, { autoAlpha: 1, yPercent: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 0.2)
-    .fromTo("[data-a='review']", { autoAlpha: 0, y: 120 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1, ease: "power2.out" }, 0.6)
-    .to("[data-a='review-track']", { x: travel, duration: 4 }, "+=0.2")
-    .to({}, { duration: 0.6 });
+  const reveal = (into: gsap.core.Timeline) =>
+    into
+      .fromTo("[data-a='glow']", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 }, 0)
+      .fromTo("[data-a='reviews-head']", { autoAlpha: 0, yPercent: 110 }, { autoAlpha: 1, yPercent: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 0.2)
+      .fromTo("[data-a='review']", { autoAlpha: 0, y: 120 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1, ease: "power2.out" }, 0.6);
+  const slide = () => tl.to("[data-a='review-track']", { x: travel, duration: 4 }, "+=0.2").to({}, { duration: 0.6 });
+
+  const mm = gsap.matchMedia(root);
+  mm.add("(min-width: 64rem)", () => {
+    reveal(tl);
+    slide();
+  });
+  // Mobile: reveal while the section scrolls into view (from 40% of it showing
+  // until it pins), so it never arrives empty; the pinned part only slides.
+  mm.add("(width < 64rem)", () => {
+    reveal(
+      reduced ? tl : gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: root, start: "top 60%", end: "top top", scrub: 0.6, onRefresh: jumpToScroll },
+      }),
+    );
+    slide();
+  });
+  return () => mm.revert();
 };
 
 export default function Reviews() {

@@ -27,7 +27,8 @@ const build: SceneBuilder = (_tl, _root, { reduced }) => {
     // "Vending" settles to 1 alongside its own clip-path wipe (2nd line: 0.2 + 0.3 stagger).
     .fromTo(
       "[data-a-scale='vending']",
-      { scale: 1.4, transformOrigin: "left center" },
+      // Mobile centres the headline, so it settles about its centre there.
+      { scale: 1.4, transformOrigin: () => (window.matchMedia("(width < 64rem)").matches ? "center center" : "left center") },
       { scale: 1, duration: 1.2, ease: "power2.out" },
       0.5,
     )
@@ -99,15 +100,23 @@ export default function IntroHero() {
       </div> */}
 
       {/* Headline + machine */}
-      <div className={`${FRAME} flex items-center pl-175 max-lg:flex-col max-lg:px-60`}>
-        <h1 className="flex w-769 shrink-0 flex-col uppercase max-lg:w-full max-lg:pt-400">
+      {/*
+        Mobile: the headline sits centred just above the machine. Its bottom
+        padding is the machine's visible height (slot height minus the 79/1392
+        transparent top, less the 10svh it hangs below the screen and the 30px
+        HERO_DROP in TravelMachine) plus a 24px gap.
+      */}
+      <div
+        className={`${FRAME} flex items-center pl-175 max-lg:flex-col max-lg:justify-end max-lg:px-60 max-lg:pb-[calc(min(68vw*1392/624,72svh)*1313/1392-10svh-30px+24px)]`}
+      >
+        <h1 className="flex w-769 shrink-0 flex-col uppercase max-lg:w-full max-lg:items-center max-lg:text-center">
           {/* <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
             Smart
           </span> */}
           <span data-a="headline-line" data-a-scale="vending" className="invisible -mt-24.25 font-condensed font-bold text-sun fs-187.5 leading-[0.964] tracking-[-0.02em]">
             Vending
           </span>
-          <span data-a="headline-line" className="invisible -mt-42 ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
+          <span data-a="headline-line" className="invisible -mt-42 ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em] max-lg:ml-0">
             Done Smart
           </span>
         </h1>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { whenStoryLoaded } from "@/components/sections/story-loader";
 import { finishIntro } from "./intro";
 import { CLIPS, EMBER_GRADIENT, EMBER_RECTS, FRAMES, PIECES, PIVOT } from "./preloader-shapes";
 
@@ -60,9 +62,10 @@ export default function Preloader() {
   const group = useRef<SVGGElement>(null);
   const ember = useRef<SVGRectElement>(null);
   const clip = useRef<SVGRectElement>(null);
+  const loader = useRef<HTMLDivElement>(null);
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const el = root.current;
       const svgEl = svg.current;
       const g = group.current;
@@ -85,6 +88,7 @@ export default function Preloader() {
       };
 
       if (played || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(loader.current, { autoAlpha: 0 });
         finish();
         return;
       }
@@ -131,25 +135,50 @@ export default function Preloader() {
         clipRect.setAttribute("height", String(st.ch));
       };
 
-      const tl = gsap.timeline({ delay: 0.4, onUpdate: render });
-      tl.to(st, { ...pose(1), duration: 1.1, ease: "power3.inOut" })
-        // Hold on the assembled logo until the page has loaded.
-        .call(
-          () => {
-            if (document.readyState === "complete") return;
-            tl.pause();
-            window.addEventListener("load", () => tl.resume(), { once: true });
-          },
-          undefined,
-          "+=0.35",
-        )
-        // From here the variant frames clip: start on Variant2's (fully around the logo).
-        .set(st, { cx: CLIPS[0][0], cy: CLIPS[0][1], cw: CLIPS[0][2], ch: CLIPS[0][3] })
-        .to(st, { ...pose(2), duration: 0.8, ease: "power2.inOut" })
-        .to(st, { ...pose(3, emberEnd), duration: 1, ease: "power3.in" })
-        .call(finish);
+      const play = contextSafe!(() => {
+        const tl = gsap.timeline({ delay: 0.4, onUpdate: render });
+        tl.to(st, { ...pose(1), duration: 1.1, ease: "power3.inOut" })
+          // Hold on the assembled logo until the page has loaded.
+          .call(
+            () => {
+              if (document.readyState === "complete") return;
+              tl.pause();
+              window.addEventListener("load", () => tl.resume(), { once: true });
+            },
+            undefined,
+            "+=0.35",
+          )
+          // From here the variant frames clip: start on Variant2's (fully around the logo).
+          .set(st, { cx: CLIPS[0][0], cy: CLIPS[0][1], cw: CLIPS[0][2], ch: CLIPS[0][3] })
+          .to(st, { ...pose(2), duration: 0.8, ease: "power2.inOut" })
+          .to(st, { ...pose(3, emberEnd), duration: 1, ease: "power3.in" })
+          .call(finish);
+      });
+
+      // Mobile: first load every story frame behind the loading screen (phones
+      // can't fetch them fast enough while scrolling), then fade it out onto the
+      // preloader above.
+      let alive = true;
+      const loading = loader.current;
+      if (loading && window.matchMedia("(width < 64rem)").matches) {
+        const bar = loading.querySelector<HTMLElement>("[data-a='loader-bar']");
+        const pct = loading.querySelector<HTMLElement>("[data-a='loader-pct']");
+        whenStoryLoaded((p) => {
+          if (bar) bar.style.transform = `scaleX(${p})`;
+          if (pct) pct.textContent = `${Math.round(p * 100)}%`;
+        }).then(
+          contextSafe!(() => {
+            if (!alive) return;
+            gsap.to(loading, { autoAlpha: 0, duration: 0.5, delay: 0.2, ease: "power2.out", onComplete: play });
+          }),
+        );
+      } else {
+        gsap.set(loading, { autoAlpha: 0 });
+        play();
+      }
 
       return () => {
+        alive = false;
         unlock();
         // Unmounted mid-intro (not a StrictMode re-run): release anything waiting on it.
         setTimeout(() => {
@@ -198,6 +227,17 @@ export default function Preloader() {
           </g>
         </g>
       </svg>
+
+      {/* Mobile loading screen: holds until every story frame is loaded, then fades onto the preloader */}
+      <div ref={loader} className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-[20px] bg-white lg:hidden">
+        <Image src="/images/vendiq/logo-mark.png" alt="" width={112} height={85} priority className="h-[40px] w-auto" />
+        <div className="h-[3px] w-[160px] overflow-hidden rounded-full bg-[#f1e6dc]">
+          <div data-a="loader-bar" className="h-full origin-left scale-x-0 bg-brand" />
+        </div>
+        <p data-a="loader-pct" className="font-condensed font-bold text-brand-deep text-[18px] leading-none tabular-nums">
+          0%
+        </p>
+      </div>
     </div>
   );
 }

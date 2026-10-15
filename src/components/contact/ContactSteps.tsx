@@ -69,11 +69,11 @@ export default function ContactSteps() {
     <section ref={root} aria-labelledby="steps-heading" className="flow-units flex justify-center pt-200 max-lg:px-24 max-lg:pt-100">
       <div data-a="steps-card" className="bg-ember-linear invisible w-1572 rounded-[20px] px-85 pt-90 pb-110 text-white max-lg:w-full max-lg:px-36 max-lg:pt-56 max-lg:pb-64">
         <header className="flex items-end gap-140 max-lg:flex-col max-lg:items-start max-lg:gap-12">
-          <p className="flex shrink-0 items-center gap-15 pb-12 font-bold text-[#fffcf6] uppercase fs-40 tracking-[-0.02em]">
-            <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-33 w-auto" />
+          <p className="flex shrink-0 items-center gap-15 pb-12 font-bold text-[#fffcf6] uppercase fs-40 tracking-[-0.02em] max-lg:fs-28">
+            <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-33 w-auto max-lg:h-24" />
             How it works
           </p>
-          <h2 id="steps-heading" className="pt-8 font-condensed font-bold uppercase fs-93 leading-[0.825] tracking-[-0.04em]">
+          <h2 id="steps-heading" className="pt-8 font-condensed font-bold uppercase fs-93 leading-[0.825] tracking-[-0.04em] max-lg:fs-58 max-lg:leading-[0.9]">
             From hello to <span className="text-sun">tap &amp; go</span>
           </h2>
         </header>

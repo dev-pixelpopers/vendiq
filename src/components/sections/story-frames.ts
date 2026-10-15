@@ -67,12 +67,14 @@ export const FOOD_IN_LAST = { x: 1088, y: 199, w: 468, h: 1180 };
 
 /**
  * Fit the 1920×980 composition into a W×H (CSS px) stage; on narrow screens
- * zoom in on the product.
+ * zoom in on the product, centring `focusX` (Figma px). The machine sits at the
+ * centre of every render, so callers pass the drawn frame's centre to keep it
+ * centred on screen.
  */
-export function fitStage(W: number, H: number) {
+export function fitStage(W: number, H: number, focusX = 1180) {
   const desktop = W / H >= 1.25;
   const s = desktop ? Math.min(W / STAGE_W, H / STAGE_H) : (H / STAGE_H) * 0.72;
-  const ox = desktop ? (W - STAGE_W * s) / 2 : W / 2 - 1180 * s;
+  const ox = desktop ? (W - STAGE_W * s) / 2 : W / 2 - focusX * s;
   const oy = (H - STAGE_H * s) / 2;
   return { desktop, s, ox, oy };
 }
@@ -82,7 +84,7 @@ export const frameScale = (frame: StoryFrame, W: number, H: number) => (frame.w 
 
 /** Map a point in a frame's source image to stage px. */
 export function frameToStage(frame: StoryFrame, px: number, py: number, W: number, H: number) {
-  const { s, ox, oy } = fitStage(W, H);
+  const { s, ox, oy } = fitStage(W, H, frame.x + frame.w / 2);
   return {
     x: ox + (frame.x + (px * frame.w) / frame.srcW) * s,
     y: oy + (frame.y + (py * frame.h) / frame.srcH) * s,
