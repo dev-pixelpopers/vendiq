@@ -61,7 +61,10 @@ export default function IntroHero() {
     <ScrollScene
       label="VendIQ — Smart vending reimagined"
       trackClassName="w-full"
-      stageClassName="bg-white"
+      // Mobile layout knobs: where the headline starts, and the machine's width —
+      // sized so its body (1249 of 624 px wide) fills the space under the headline
+      // and runs ~8% past the bottom edge, capped at 80vw.
+      stageClassName="bg-white max-lg:[--hero-top:max(96px,12svh)] max-lg:[--machine-w:min(80vw,calc((100svh-var(--hero-top)-var(--u)*228-24px)*624/1249*1.08))]"
       build={build}
     >
       {/* Preloader; its ember stays behind as the full-bleed backdrop */}
@@ -69,15 +72,19 @@ export default function IntroHero() {
         <Preloader />
       </div>
 
-      {/* Outline wordmark fragments (decorative) drifting in from the right */}
-      <div aria-hidden className={`${FRAME} pointer-events-none overflow-visible max-lg:hidden`}>
-        <div data-a="outline" className="invisible absolute top-219.5 left-1024 h-188.75 w-894 overflow-hidden">
+      {/*
+        Outline wordmark fragments (decorative) drifting in from the right.
+        Mobile: same stack, centred across the screen from halfway down, so it
+        sits behind the machine (the travelling overlay is drawn above this stage).
+      */}
+      <div aria-hidden className={`${FRAME} pointer-events-none overflow-visible max-lg:overflow-hidden`}>
+        <div data-a="outline" className="invisible absolute top-219.5 left-1024 h-188.75 w-894 overflow-hidden max-lg:top-1/2 max-lg:left-53">
           <Image src={`${A}/outline-wordmark-b.svg`} alt="" width={894} height={234} className="h-233.75 w-894 max-w-none" />
         </div>
-        <div data-a="outline" className="invisible absolute top-414 left-1490 h-189 w-432 overflow-hidden">
+        <div data-a="outline" className="invisible absolute top-414 left-1490 h-189 w-432 overflow-hidden max-lg:top-[calc(50%+var(--spacing)*194.5)] max-lg:left-519">
           <Image src={`${A}/outline-wordmark-c.svg`} alt="" width={894} height={234} className="h-233.75 w-894 max-w-none" />
         </div>
-        <div data-a="outline" className="invisible absolute top-638 left-1024 h-188.75 w-894 overflow-hidden">
+        <div data-a="outline" className="invisible absolute top-638 left-1024 h-188.75 w-894 overflow-hidden max-lg:top-[calc(50%+var(--spacing)*418.5)] max-lg:left-53">
           <Image src={`${A}/outline-wordmark-a.svg`} alt="" width={894} height={234} className="h-233.75 w-894 max-w-none" />
         </div>
       </div>
@@ -100,15 +107,8 @@ export default function IntroHero() {
       </div> */}
 
       {/* Headline + machine */}
-      {/*
-        Mobile: the headline sits centred just above the machine. Its bottom
-        padding is the machine's visible height (slot height minus the 79/1392
-        transparent top, less the 10svh it hangs below the screen and the 30px
-        HERO_DROP in TravelMachine) plus a 24px gap.
-      */}
-      <div
-        className={`${FRAME} flex items-center pl-175 max-lg:flex-col max-lg:justify-end max-lg:px-60 max-lg:pb-[calc(min(68vw*1392/624,72svh)*1313/1392-10svh-30px+24px)]`}
-      >
+      {/* Mobile: the headline starts just under the logo bar (--hero-top), centred. */}
+      <div className={`${FRAME} flex items-center pl-175 max-lg:flex-col max-lg:justify-start max-lg:px-60 max-lg:pt-[var(--hero-top)]`}>
         <h1 className="flex w-769 shrink-0 flex-col uppercase max-lg:w-full max-lg:items-center max-lg:text-center">
           {/* <span data-a="headline-line" className="invisible ml-9.75 font-sans font-bold text-white fs-92.75 leading-[1.2325] tracking-[-0.04em]">
             Smart
@@ -122,12 +122,17 @@ export default function IntroHero() {
         </h1>
       </div>
 
-      {/* Where the travelling machine (TravelMachine) sits in the hero */}
+      {/*
+        Where the travelling machine (TravelMachine) sits in the hero.
+        Mobile: its body starts 24px under the headline (headline top + its
+        ~228-unit height + gap), less the 79/624 transparent band above the body
+        and the 30px HERO_DROP it is shown lower by; the bottom runs off screen.
+      */}
       <div
         ref={slot}
         role="img"
         aria-label="VendIQ smart vending machine stocked with drinks"
-        className="pointer-events-none absolute top-0 right-[calc(50%-601*var(--u))] aspect-[624/1392] w-634 max-lg:inset-x-0 max-lg:top-auto max-lg:bottom-[-10svh] max-lg:mx-auto max-lg:w-[min(68vw,calc(72svh*624/1392))]"
+        className="pointer-events-none absolute top-0 right-[calc(50%-601*var(--u))] aspect-[624/1392] w-634 max-lg:inset-x-0 max-lg:top-[calc(var(--hero-top)+var(--u)*228+24px-30px-var(--machine-w)*79/624)] max-lg:mx-auto max-lg:w-[var(--machine-w)]"
       />
 
     </ScrollScene>
