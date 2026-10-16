@@ -298,8 +298,8 @@ export default function BrandStory() {
           className={`${LAYER} flex justify-center pt-230 max-lg:w-1/2 max-lg:items-center max-lg:justify-self-end max-lg:pt-120`}
         >
           <div className="relative w-384.75 max-lg:w-auto">
-            <Image data-a="arc-left" src={`${A}/arc-left.svg`} alt="" width={508} height={532} className="invisible absolute top-62 -left-204 h-532 w-508 max-w-none max-lg:hidden" />
-            <Image data-a="arc-right" src={`${A}/arc-right.svg`} alt="" width={509} height={634} className="invisible absolute top-101 left-57 h-634 w-509 max-w-none max-lg:hidden" />
+            <Image data-a="arc-left" src={`${A}/arc-left.svg`} alt="" width={508} height={532} className="invisible absolute top-62 -left-204 h-532 z-1 w-508 max-w-none max-lg:hidden" />
+            <Image data-a="arc-right" src={`${A}/arc-right.svg`} alt="" width={509} height={634} className="invisible absolute top-101 left-57 h-634 z-1 w-509 max-w-none max-lg:hidden" />
             <Image
               data-a="pantry"
               src={`${A}/machine-pantry.webp`}
@@ -307,7 +307,7 @@ export default function BrandStory() {
               width={532}
               height={1315}
               sizes="(min-width: 1024px) 20vw, 40vw"
-              className="invisible relative h-863 w-auto max-w-none max-lg:h-1150"
+              className="invisible relative h-863 z-5 w-auto max-w-none max-lg:h-1150"
             />
           </div>
         </div>

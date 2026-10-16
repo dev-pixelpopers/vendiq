@@ -29,9 +29,18 @@ const ROWS: Field[][] = [
  */
 const LABEL =
   "pointer-events-none absolute left-6 origin-left font-normal text-[#3d3d3d] uppercase fs-18 tracking-[0.02em] transition-transform duration-200 " +
-  "peer-focus:-translate-y-26 peer-focus:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-26 peer-[:not(:placeholder-shown)]:scale-75";
+  "peer-focus:scale-75 peer-[:not(:placeholder-shown)]:scale-75";
+const LIFT = "peer-focus:-translate-y-26 peer-[:not(:placeholder-shown)]:-translate-y-26";
+// The textarea label rests higher, so it lifts further to clear the text like the inputs do.
+const LIFT_TEXTAREA = "peer-focus:-translate-y-38 peer-[:not(:placeholder-shown)]:-translate-y-38";
 // 16px minimum on small screens so iOS Safari doesn't zoom in on focus.
 const INPUT = "peer w-full bg-transparent px-6 text-black fs-18 outline-none max-lg:text-[16px]";
+
+const REQUIRED_MARK = (
+  <span aria-hidden="true" className="ml-4 text-brand">
+    *
+  </span>
+);
 
 function TextField({ name, label, type = "text", autoComplete }: Field) {
   return (
@@ -41,24 +50,49 @@ function TextField({ name, label, type = "text", autoComplete }: Field) {
         type={type}
         autoComplete={autoComplete}
         placeholder=" "
+        required
         className={`${INPUT} h-58 border-0 border-b-2 border-[#6d6d6d] pt-22 pb-8 focus:border-brand`}
       />
-      <span className={`${LABEL} bottom-21`}>{label}</span>
+      <span className={`${LABEL} ${LIFT} bottom-21`}>
+        {label}
+        {REQUIRED_MARK}
+      </span>
     </label>
   );
 }
 
+type Status = "idle" | "sending" | "sent" | "error";
+
 /** Lead form shared by the homepage contact card and the contact page. */
 export default function ContactForm({ className = "" }: { className?: string }) {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSent(true);
+    const form = e.currentTarget;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      if (!res.ok) throw new Error();
+      form.reset();
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
     <form onSubmit={onSubmit} className={`flex flex-col ${className}`}>
+      <p className="mb-26 text-[#6d6d6d] fs-16">
+        <span aria-hidden="true" className="mr-4 text-brand">
+          *
+        </span>
+        All fields are required
+      </p>
       {ROWS.map((row, i) => (
         <div
           key={i}
@@ -76,20 +110,29 @@ export default function ContactForm({ className = "" }: { className?: string }) 
             name="message"
             rows={2}
             placeholder=" "
-            className={`${INPUT} min-h-58 resize-none border-0 border-b-2 border-transparent pt-22 pb-8 focus:border-brand`}
+            required
+            className={`${INPUT} min-h-58 resize-none border-0 border-b-2 border-[#6d6d6d] pt-22 pb-8 focus:border-brand`}
           />
-          <span className={`${LABEL} top-22`}>Tell us about your space</span>
+          <span className={`${LABEL} ${LIFT_TEXTAREA} top-22`}>
+            Tell us about your space
+            {REQUIRED_MARK}
+          </span>
         </label>
         <button
           data-a="submit"
           type="submit"
-          className="mt-39 flex h-54 w-228 shrink-0 items-center justify-center gap-10 rounded-[4px] bg-[#212121] font-medium text-[#fbfbfb] capitalize fs-17 transition-colors hover:bg-brand max-lg:w-full"
+          disabled={status === "sending"}
+          className="mt-39 flex h-54 w-228 shrink-0 items-center justify-center gap-10 rounded-[4px] bg-[#212121] font-medium text-[#fbfbfb] capitalize fs-17 transition-colors hover:bg-brand disabled:cursor-wait disabled:opacity-70 max-lg:w-full"
         >
           <Image src={`${A}/logo-mark.png`} alt="" width={112} height={85} className="h-31 w-auto" />
-          Submit
+          {status === "sending" ? "Sending…" : "Submit"}
         </button>
-        <p role="status" className="absolute top-full right-0 mt-12 font-medium text-brand fs-16 max-lg:static">
-          {sent ? "Thanks — we’ll be in touch shortly." : ""}
+        <p
+          role="status"
+          className={`absolute top-full right-0 mt-16 font-medium fs-28 max-lg:static ${status === "error" ? "text-red-600" : "text-[#eda80d]"}`}
+        >
+          {status === "sent" && "Thanks — we’ll be in touch shortly."}
+          {status === "error" && "Something went wrong. Please try again."}
         </p>
       </div>
     </form>

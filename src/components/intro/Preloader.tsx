@@ -164,7 +164,8 @@ export default function Preloader() {
         const bar = loading.querySelector<HTMLElement>("[data-a='loader-bar']");
         const pct = loading.querySelector<HTMLElement>("[data-a='loader-pct']");
         whenStoryLoaded((p) => {
-          if (bar) bar.style.transform = `scaleX(${p})`;
+          // `scale`, not `transform`: Tailwind's scale-x-0 sets the `scale` property, which would multiply it back to 0.
+          if (bar) bar.style.scale = `${p} 1`;
           if (pct) pct.textContent = `${Math.round(p * 100)}%`;
         }).then(
           contextSafe!(() => {

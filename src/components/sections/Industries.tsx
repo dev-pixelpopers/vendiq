@@ -98,7 +98,7 @@ export default function Industries() {
       <div
         data-a="venue-shade"
         aria-hidden
-        className={`${LAYER} invisible self-end h-[63%] bg-[linear-gradient(180deg,rgba(100,48,13,0)_6.4%,#692300_91.7%)]`}
+        className={`${LAYER} invisible self-end h-[48%] z-10 bg-[linear-gradient(180deg,rgba(100,48,13,0)_20%,#692300_100%)]`}
       />
 
       {/* Fridge + title + venue labels */}
@@ -114,7 +114,7 @@ export default function Industries() {
           </div>
         </div>
         {/* Mobile: wide enough that the machine fills ~¾ of the screen height, as on desktop */}
-        <div ref={slot} className="-mt-50 w-414 shrink-0 max-lg:mt-[60px] max-lg:w-650">
+        <div ref={slot} className="-mt-10 -mr-30 w-370 shrink-0 max-lg:mt-[60px] max-lg:w-650">
           <div
             ref={machine}
             data-a="machine"
@@ -127,7 +127,7 @@ export default function Industries() {
       </div>
 
       <div className={`${FRAME} pointer-events-none flex justify-center`}>
-        <ul className="mt-754 grid h-108 w-1032 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] overflow-hidden max-lg:mt-[70vh] max-lg:w-full">
+        <ul className="mt-754 z-[15] grid h-108 w-1032 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] overflow-hidden max-lg:mt-[70vh] max-lg:w-full">
           {VENUES.map((v) => (
             <li
               key={v.label}

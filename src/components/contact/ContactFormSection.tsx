@@ -39,7 +39,7 @@ export default function ContactFormSection({
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         gsap
-          .timeline({ scrollTrigger: { trigger: "[data-a='form-card']", start: "top 82%" } })
+          .timeline({ scrollTrigger: { trigger: "[data-a='form-card']", start: "top 80%", end: "+=300", scrub: 1 } })
           .fromTo("[data-a='form-card']", { autoAlpha: 0, y: 80 }, { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" })
           .fromTo(
             "[data-a='form-head']",

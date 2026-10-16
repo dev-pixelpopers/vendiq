@@ -58,7 +58,7 @@ export default function AdSpace() {
       <div className={`${FRAME} flex justify-center pt-50 max-lg:px-24 max-lg:pt-120`}>
         <div data-a="ad-card" className="bg-ember-linear flex h-900 w-1572 items-start gap-101 rounded-[20px] pt-8 pl-85 max-lg:h-auto max-lg:w-full max-lg:flex-col max-lg:gap-24 max-lg:p-40 max-lg:pb-[45vw]">
           <div className="mt-140 w-379 shrink-0 overflow-hidden max-lg:mt-0 max-lg:w-full">
-            <h2 data-a="ad-label" className="invisible flex items-start gap-14 font-bold text-[#fffcf6] uppercase fs-40 tracking-[-0.02em] max-lg:text-lg">
+            <h2 data-a="ad-label" className="invisible leading-[1] flex items-start gap-14 font-bold text-[#fffcf6] uppercase fs-40 tracking-[-0.02em] max-lg:text-lg">
               <Image src="/images/vendiq/logo-mark.png" alt="" width={112} height={85} className="mt-35 h-33 w-auto max-lg:mt-[4px] max-lg:h-[18px]" />
               <span>
                 Your Logo on the
